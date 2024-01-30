@@ -1,12 +1,8 @@
 # Init Project
+-   npm init  
 
--   npm init -y
--   npx express-generator (Skip if not neccessary) // Use Express Generator for build Architecture
+# running project
+-   nodemon app
 
-# Install production dependencies
-
--   npm install express mongoose method-override dotenv ejs ejs-mate cookie-parser
-
-# Install development dependency
-
-npm install --save-dev nodemon
+# documentation API
+- http://localhost:3000/api-docs
