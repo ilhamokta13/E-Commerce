@@ -2,10 +2,14 @@ const express = require('express');
 const connectToDatabase = require('./utils/db-connection');
 const setupMiddleware = require('./utils/middleware');
 const ExpressError = require('./utils/ExpressError');
-const indexRoutes = require('./routes/index');
+const swagger = require('./swagger')
+
+
+// Routes
+const aaa = require('./routes/index-route');
 const userRoutes = require('./routes/user-route');
 const productRoutes = require('./routes/product-route');
-const swagger = require('./swagger')
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,7 +24,7 @@ setupMiddleware(app);
 app.use('/api-docs', swagger.serve, swagger.setup);
 
 // Routes
-app.use('/', indexRoutes);
+app.use('/', aaa);
 app.use('/user', userRoutes);
 app.use('/product', productRoutes);
 
@@ -33,7 +37,7 @@ app.all('*', (req, res, next) => {
 app.use((err, req, res, next) => {
   const { statusCode = 500 } = err;
   if (!err.message) err.message = 'Oh No, Something Went Wrong!';
-  res.status(statusCode).render('error', { err });
+  res.status(statusCode).json({ error: err.message });
 });
 
 // Listen to Port

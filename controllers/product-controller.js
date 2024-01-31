@@ -5,7 +5,7 @@ const fs = require('fs');
 
 class ProductController {
 
-    static async createProduct(req, res, next) {
+    static async createProduct(req, res) {
         try {
             const { nameProduct, price, description, category, sellerID, releaseDate, location } = req.body;
             const findSellerID = await User.findById(sellerID);
@@ -39,7 +39,7 @@ class ProductController {
         }
     }
 
-    static async getAllProduct(req, res, next) {
+    static async getAllProduct(req, res) {
         try {
             const products = await Product.find().populate('sellerID');
             console.log(products);
@@ -55,7 +55,7 @@ class ProductController {
         }
     }
 
-    static async getProductById(req, res, next) {
+    static async getProductById(req, res) {
         try {
             const { id } = req.params;
             const product = await Product.findById(id).populate('sellerID');
@@ -71,7 +71,7 @@ class ProductController {
         }
     }
 
-    static async updateProduct(req, res, next) {
+    static async updateProduct(req, res) {
         try {
             const { id } = req.params;
             console.log(id);
@@ -98,7 +98,7 @@ class ProductController {
         }
     }
 
-    static async deleteProduct(req, res, next) {
+    static async deleteProduct(req, res) {
         try {
             const { id } = req.params;
             const product = await Product.findByIdAndDelete(id);
