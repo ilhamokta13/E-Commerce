@@ -4,6 +4,7 @@ const setupMiddleware = require('./utils/middleware');
 const ExpressError = require('./utils/ExpressError');
 const indexRoutes = require('./routes/index');
 const userRoutes = require('./routes/user-route');
+const productRoutes = require('./routes/product-route');
 const swagger = require('./swagger')
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api-docs', swagger.serve, swagger.setup);
 // Routes
 app.use('/', indexRoutes);
 app.use('/user', userRoutes);
+app.use('/product', productRoutes);
 
 // Error route
 app.all('*', (req, res, next) => {
