@@ -45,6 +45,7 @@ class UserController {
             }
             const secretKey = process.env.SECRET_KEY;
             const payload = {
+                id: user._id,
                 email: user.email,
                 username: user.username,
                 role: user.role
