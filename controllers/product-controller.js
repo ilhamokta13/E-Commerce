@@ -7,7 +7,9 @@ class ProductController {
 
     static async createProduct(req, res) {
         try {
-            const { nameProduct, price, description, category, sellerID, releaseDate, location } = req.body;
+            const { nameProduct, price, description, category, releaseDate, location } = req.body;
+            const sellerID = req.user.id;
+            console.log(sellerID);
             const findSellerID = await User.findById(sellerID);
             if (!findSellerID) {
                 const error = new Error('Seller ID not found');

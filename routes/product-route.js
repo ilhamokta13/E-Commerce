@@ -11,9 +11,24 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage });
+const jwt = require('jsonwebtoken');
+
+const checkAuth = (req, res, next) => {
+    console.log(req.headers.authorization);
+    if (req.headers.authorization.split(' ')[0] === 'Bearer') {
+
+        const payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.SECRET_KEY);
+        req.user = payload;
+        next();
+    } else {
+        res.status(401).json({
+            message: 'Unauthorized'
+        });
+    }
+}
 
 router.route('/create')
-    .post(upload.single('image'), productController.createProduct)
+    .post(checkAuth, upload.single('image'), productController.createProduct)
 
 router.route('/all')
     .get(productController.getAllProduct)
