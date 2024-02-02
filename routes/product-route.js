@@ -37,7 +37,7 @@ router.route('/detail/:id')
     .get(productController.getProductById)
 
 router.route('/update/:id')
-    .patch(productController.updateProduct)
+    .patch(checkAuth, productController.updateProduct)
 
 router.route('/delete/:id')
     .delete(productController.deleteProduct)

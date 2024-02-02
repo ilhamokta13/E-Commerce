@@ -77,12 +77,18 @@ class ProductController {
         try {
             const { id } = req.params;
             console.log(id);
-            const { nameProduct, price, description, image, category, sellerID, releaseDate, location } = req.body;
+            const { nameProduct, price, description, category, releaseDate, location } = req.body;
+            const findProduct = await Product.findById(id);
+            const pathh = path.join(__dirname, `../uploads/${findProduct.image}`);
+            console.log(pathh);
+            fs.unlinkSync(pathh);
+            const newImage = req.file.filename;
+            const sellerID = req.user.id;
             const product = await Product.findByIdAndUpdate(id, {
                 nameProduct,
                 price,
                 description,
-                image,
+                image: newImage,
                 category,
                 sellerID,
                 releaseDate,
