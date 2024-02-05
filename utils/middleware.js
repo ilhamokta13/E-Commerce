@@ -11,6 +11,8 @@ const setupMiddleware = (app) => {
   app.use(methodOverride('_method'));
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, 'public')));
+  app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+  // app.use(express.static(path.join(__dirname, '../uploads')));
 
   app.engine('ejs', ejsMate);
   app.set('view engine', 'ejs');
