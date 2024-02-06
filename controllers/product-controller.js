@@ -85,7 +85,11 @@ class ProductController {
             if (pathh) {
                 fs.unlinkSync(pathh);
             }
-            const newImage = req.file.filename;
+            var newImage;
+            if (!req.file) {
+                newImage = req.file.filename;
+            }
+
             const sellerID = req.user.id;
             const product = await Product.findByIdAndUpdate(id, {
                 nameProduct,
