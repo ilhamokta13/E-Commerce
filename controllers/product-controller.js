@@ -82,12 +82,19 @@ class ProductController {
             const findProduct = await Product.findById(id);
             const pathh = path.join(__dirname, `../uploads/${findProduct.image}`);
             console.log(pathh);
-            if (pathh) {
-                fs.unlinkSync(pathh);
+            // Check if the image file exists
+            if (fs.existsSync(imagePath)) {
+                // Delete the image file
+                fs.unlinkSync(imagePath);
+            } else {
+                console.log("File not found:", imagePath);
             }
-            var newImage;
-            if (!req.file) {
+
+            let newImage;
+            if (req.file) {
                 newImage = req.file.filename;
+            } else {
+                newImage = findProduct.image; // Keep the existing image if no new file uploaded
             }
 
             const sellerID = req.user.id;
