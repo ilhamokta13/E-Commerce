@@ -23,6 +23,12 @@ setupMiddleware(app);
 // Swagger
 app.use('/api-docs', swagger.serve, swagger.setup);
 
+// Middleware for logging
+app.use((req, res, next) => {
+  console.log(req.url);
+  next();
+});
+
 // Routes
 app.use('/', aaa);
 app.use('/user', userRoutes);
