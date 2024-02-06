@@ -83,11 +83,11 @@ class ProductController {
             const pathh = path.join(__dirname, `../uploads/${findProduct.image}`);
             console.log(pathh);
             // Check if the image file exists
-            if (fs.existsSync(imagePath)) {
+            if (fs.existsSync(pathh)) {
                 // Delete the image file
-                fs.unlinkSync(imagePath);
+                fs.unlinkSync(pathh);
             } else {
-                console.log("File not found:", imagePath);
+                console.log("File not found:", pathh);
             }
 
             let newImage;
