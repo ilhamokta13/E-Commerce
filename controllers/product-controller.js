@@ -75,6 +75,7 @@ class ProductController {
 
     static async updateProduct(req, res) {
         try {
+            console.log(req.url);
             const { id } = req.params;
             console.log(id);
             const { nameProduct, price, description, category, releaseDate, location } = req.body;
