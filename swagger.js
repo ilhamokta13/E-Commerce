@@ -18,6 +18,18 @@ const swaggerOptions = {
                 description: 'Development server',
             },
         ],
+        security: [{
+            BearerAuth: [],
+        }],
+        components: {
+            securitySchemes: {
+                BearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
         paths: {
             ...getUserPaths(),
             ...getProductPaths(),
@@ -126,6 +138,22 @@ function getProductPaths() {
                 },
             },
         },
+        '/admin/product': {
+            get: {
+                summary: 'Get all products.',
+                operationId: 'getAdminProduct',
+                description: 'Endpoint to get all products for admin.',
+                tags: ['Product'],
+                responses: {
+                    200: {
+                        description: 'Successful response with all products.',
+                    },
+                    500: {
+                        description: 'Internal Server Error.',
+                    },
+                },
+            },
+        },
         // Product Routes
         '/product/detail/{id}': {
             get: {
@@ -172,7 +200,6 @@ function getProductPaths() {
                                     description: { type: 'string' },
                                     image: { type: 'string', format: 'binary' }, // Use 'binary' for file uploads
                                     category: { type: 'string' },
-                                    sellerID: { type: 'string' },
                                     releaseDate: { type: 'string' },
                                     location: { type: 'string' },
                                 },
@@ -194,8 +221,6 @@ function getProductPaths() {
                 },
             },
         },
-
-        // Product Routes
         '/product/update/{id}': {
             patch: {
                 summary: 'Update product by ID.',
@@ -214,21 +239,22 @@ function getProductPaths() {
                     },
                 ],
                 requestBody: {
+                    required: true,
                     content: {
-                        'application/json': {
+                        'multipart/form-data': {
                             schema: {
                                 type: 'object',
                                 properties: {
                                     nameProduct: { type: 'string' },
                                     price: { type: 'number' },
                                     description: { type: 'string' },
-                                    image: { type: 'string' },
+                                    image: { type: 'string', format: 'binary' }, // Define image as binary data
                                     category: { type: 'string' },
                                     sellerID: { type: 'string' },
-                                    releaseDate: { type: 'string' },
+                                    releaseDate: { type: 'string', format: 'date' }, // Assuming releaseDate is a date
                                     location: { type: 'string' },
                                 },
-                                required: ['nameProduct', 'price', 'description', 'image', 'category', 'sellerID', 'releaseDate', 'location'],
+                                required: ['nameProduct', 'price', 'description', 'category', 'sellerID', 'releaseDate', 'location'],
                             },
                         },
                     },
@@ -243,6 +269,7 @@ function getProductPaths() {
                 },
             },
         },
+
         // Product Routes
         '/product/delete/{id}': {
             delete: {

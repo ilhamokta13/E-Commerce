@@ -1,14 +1,15 @@
 const express = require('express');
 const connectToDatabase = require('./utils/db-connection');
-const setupMiddleware = require('./utils/middleware');
+const { setupMiddleware } = require('./utils/middleware');
 const ExpressError = require('./utils/ExpressError');
 const swagger = require('./swagger')
 
 
 // Routes
-const aaa = require('./routes/index-route');
+// const aaa = require('./routes/index-route');
 const userRoutes = require('./routes/user-route');
 const productRoutes = require('./routes/product-route');
+const adminRoutes = require('./routes/admin-route');
 
 
 const app = express();
@@ -30,9 +31,10 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/', aaa);
+// app.use('/', aaa);
 app.use('/user', userRoutes);
 app.use('/product', productRoutes);
+app.use('/admin', adminRoutes);
 
 // Error route
 app.all('*', (req, res, next) => {

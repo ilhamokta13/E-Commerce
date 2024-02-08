@@ -4,6 +4,7 @@ const methodOverride = require('method-override');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const ejsMate = require('ejs-mate');
+const jwt = require('jsonwebtoken');
 
 const setupMiddleware = (app) => {
   app.use(express.json());
@@ -19,4 +20,22 @@ const setupMiddleware = (app) => {
   app.set('views', path.join(__dirname, '../views'));
 };
 
-module.exports = setupMiddleware;
+const checkAuth = (req, res, next) => {
+  console.log(req.headers.authorization);
+  if (req.headers.authorization.split(' ')[0] === 'Bearer') {
+
+    const payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.SECRET_KEY);
+    req.user = payload;
+    next();
+  } else {
+    res.status(401).json({
+      message: 'Unauthorized'
+    });
+  }
+}
+
+module.exports = {
+  setupMiddleware,
+  checkAuth
+};
+

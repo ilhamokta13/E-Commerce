@@ -57,6 +57,26 @@ class ProductController {
         }
     }
 
+    static async getAdminProduct(req, res) {
+        try {
+            const sellerID = req.user.id;
+            const products = await Product
+                .find({ sellerID: sellerID })
+                .populate('sellerID');
+            console.log(products);
+            res.status(200).json({
+                message: 'Get all products',
+                data: products
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: true,
+                message: error.message
+            });
+        }
+    }
+
+
     static async getProductById(req, res) {
         try {
             const { id } = req.params;
