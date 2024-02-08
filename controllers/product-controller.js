@@ -95,19 +95,17 @@ class ProductController {
 
     static async updateProduct(req, res) {
         try {
-            console.log(req.url);
             const { id } = req.params;
-            console.log(id);
             const { nameProduct, price, description, category, releaseDate, location } = req.body;
+
             const findProduct = await Product.findById(id);
-            const pathh = path.join(__dirname, `../uploads/${findProduct.image}`);
-            console.log(pathh);
+            const filePath = path.join(__dirname, `../uploads/${findProduct.image}`);
             // Check if the image file exists
-            if (fs.existsSync(pathh)) {
+            if (fs.existsSync(filePath)) {
                 // Delete the image file
-                fs.unlinkSync(pathh);
+                fs.unlinkSync(filePath);
             } else {
-                console.log("File not found:", pathh);
+                console.log("File not found:", filePath);
             }
 
             let newImage;

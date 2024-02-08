@@ -11,22 +11,16 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage });
-const { checkAuth } = require('../utils/middleware');
+const { checkAuth, checkAuthor, checkOwnerProduct } = require('../utils/middleware');
 
 
-router.route('/create')
-    .post(checkAuth, upload.single('image'), productController.createProduct)
-
-router.route('/all')
+router.route('/')
     .get(productController.getAllProduct)
+    .post(checkAuth, checkAuthor, upload.single('image'), productController.createProduct)
 
-router.route('/detail/:id')
-    .get(productController.getProductById)
-
-router.route('/update/:id')
-    .patch(checkAuth, upload.single('image'), productController.updateProduct)
-
-router.route('/delete/:id')
-    .delete(productController.deleteProduct)
+router.route('/:id')
+    .get(checkAuth, checkAuthor, checkOwnerProduct, productController.getProductById)
+    .patch(checkAuth, checkAuthor, checkOwnerProduct, upload.single('image'), productController.updateProduct)
+    .delete(checkAuth, checkAuthor, checkOwnerProduct, productController.deleteProduct)
 
 module.exports = router;

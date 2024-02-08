@@ -14,7 +14,7 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:3000',
+                url: 'http://localhost:3004',
                 description: 'Development server',
             },
         ],
@@ -115,6 +115,22 @@ function getUserPaths() {
                 },
             },
         },
+        '/admin/product': {
+            get: {
+                summary: 'Get all products.',
+                operationId: 'getAdminProduct',
+                description: 'Endpoint to get all products for admin.',
+                tags: ['User'],
+                responses: {
+                    200: {
+                        description: 'Successful response with all products.',
+                    },
+                    500: {
+                        description: 'Internal Server Error.',
+                    },
+                },
+            },
+        },
     };
 }
 
@@ -122,7 +138,7 @@ function getUserPaths() {
 function getProductPaths() {
     return {
         // Product Routes
-        '/product/all': {
+        '/product': {
             get: {
                 summary: 'Get all products.',
                 operationId: 'getAllProducts',
@@ -138,52 +154,8 @@ function getProductPaths() {
                 },
             },
         },
-        '/admin/product': {
-            get: {
-                summary: 'Get all products.',
-                operationId: 'getAdminProduct',
-                description: 'Endpoint to get all products for admin.',
-                tags: ['Product'],
-                responses: {
-                    200: {
-                        description: 'Successful response with all products.',
-                    },
-                    500: {
-                        description: 'Internal Server Error.',
-                    },
-                },
-            },
-        },
         // Product Routes
-        '/product/detail/{id}': {
-            get: {
-                summary: 'Get product by ID.',
-                operationId: 'getProductById',
-                description: 'Endpoint to get product details by ID.',
-                tags: ['Product'],
-                parameters: [
-                    {
-                        name: 'id',
-                        in: 'path',
-                        required: true,
-                        description: 'Product ID.',
-                        schema: {
-                            type: 'string',
-                        },
-                    },
-                ],
-                responses: {
-                    200: {
-                        description: 'Successful response with product details.',
-                    },
-                    500: {
-                        description: 'Internal Server Error.',
-                    },
-                },
-            },
-        },
-        // Product Routes
-        '/product/create': {
+        '/product': {
             post: {
                 summary: 'Create a new product.',
                 operationId: 'createProduct',
@@ -221,7 +193,36 @@ function getProductPaths() {
                 },
             },
         },
-        '/product/update/{id}': {
+        // Product Routes
+        '/product/{id}': {
+            get: {
+                summary: 'Get product by ID.',
+                operationId: 'getProductById',
+                description: 'Endpoint to get product details by ID.',
+                tags: ['Product'],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        description: 'Product ID.',
+                        schema: {
+                            type: 'string',
+                        },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: 'Successful response with product details.',
+                    },
+                    500: {
+                        description: 'Internal Server Error.',
+                    },
+                },
+            },
+        },
+        // Product Routes
+        '/product/{id}': {
             patch: {
                 summary: 'Update product by ID.',
                 operationId: 'updateProduct',
@@ -269,9 +270,8 @@ function getProductPaths() {
                 },
             },
         },
-
         // Product Routes
-        '/product/delete/{id}': {
+        '/product/{id}': {
             delete: {
                 summary: 'Delete product by ID.',
                 operationId: 'deleteProduct',

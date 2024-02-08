@@ -34,8 +34,39 @@ const checkAuth = (req, res, next) => {
   }
 }
 
+const checkAuthor = (req, res, next) => {
+  if (req.user.role === 'Seller') {
+    next();
+  } else {
+    res.status(401).json({
+      message: 'Unauthorized'
+    });
+  }
+}
+
+const checkOwnerProduct = async (req, res, next) => {
+  if (req.user.role === 'Seller') {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+    if (product.sellerID === req.user.id) {
+      next();
+    } else {
+      res.status(401).json({
+        message: 'Unauthorized'
+      });
+    }
+    next();
+  } else {
+    res.status(401).json({
+      message: 'Unauthorized'
+    });
+  }
+}
+
 module.exports = {
   setupMiddleware,
-  checkAuth
+  checkAuth,
+  checkAuthor,
+  checkOwnerProduct
 };
 
