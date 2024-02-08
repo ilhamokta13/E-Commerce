@@ -220,9 +220,7 @@ function getProductPaths() {
                     },
                 },
             },
-        },
-        // Product Routes
-        '/product/{id}': {
+
             patch: {
                 summary: 'Update product by ID.',
                 operationId: 'updateProduct',
@@ -269,9 +267,7 @@ function getProductPaths() {
                     },
                 },
             },
-        },
-        // Product Routes
-        '/product/{id}': {
+
             delete: {
                 summary: 'Delete product by ID.',
                 operationId: 'deleteProduct',
