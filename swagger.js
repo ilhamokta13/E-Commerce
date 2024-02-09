@@ -249,11 +249,10 @@ function getProductPaths() {
                                     description: { type: 'string' },
                                     image: { type: 'string', format: 'binary' }, // Define image as binary data
                                     category: { type: 'string' },
-                                    sellerID: { type: 'string' },
                                     releaseDate: { type: 'string', format: 'date' }, // Assuming releaseDate is a date
                                     location: { type: 'string' },
                                 },
-                                required: ['nameProduct', 'price', 'description', 'category', 'sellerID', 'releaseDate', 'location'],
+                                required: ['nameProduct', 'price', 'description', 'category', 'releaseDate', 'location'],
                             },
                         },
                     },
