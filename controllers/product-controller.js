@@ -60,8 +60,7 @@ class ProductController {
     static async getAdminProduct(req, res) {
         try {
             const sellerID = req.user.id;
-            const products = await Product
-                .find({ sellerID: sellerID })
+            const products = await Product.find({ sellerID: sellerID })
                 .populate('sellerID');
             console.log(products);
             res.status(200).json({

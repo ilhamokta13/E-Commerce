@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const ejsMate = require('ejs-mate');
 const jwt = require('jsonwebtoken');
+const Product = require('../models/product-schema');
 
 const setupMiddleware = (app) => {
   app.use(express.json());
@@ -48,17 +49,16 @@ const checkOwnerProduct = async (req, res, next) => {
   if (req.user.role === 'Seller') {
     const { id } = req.params;
     const product = await Product.findById(id);
-    if (product.sellerID === req.user.id) {
+    if (product.sellerID.toString() === req.user.id) {
       next();
     } else {
       res.status(401).json({
-        message: 'Unauthorized'
+        message: 'Unauthorized 1'
       });
     }
-    next();
   } else {
     res.status(401).json({
-      message: 'Unauthorized'
+      message: 'Unauthorized 2'
     });
   }
 }
