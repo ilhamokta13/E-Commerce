@@ -74,6 +74,49 @@ class UserController {
         }
     }
 
+    static async completeProfile(req, res, next) {
+        try {
+            const { shopName } = req.body;
+            const userID = req.user.id;
+            const user = await User.findById(userID);
+            if (!user) {
+                const error = new Error('User not found');
+                error.statusCode = 401;
+                throw error;
+            }
+
+            user.shopName = shopName;
+            await user.save();
+
+            res.status(200).json({
+                error: false,
+                message: 'Success',
+                data: user
+            });
+        }
+        catch (error) {
+            res.status(500).json({
+                error: true,
+                message: error.message
+            });
+        }
+    }
+
+    // static async logout(req, res, next) {
+    //     try {
+    //         res.clearCookie('accessToken');
+    //         res.status(200).json({
+    //             error: false,
+    //             message: 'Logout success'
+    //         });
+    //     } catch (error) {
+    //         res.status(500).json({
+    //             error: true,
+    //             message: error.message
+    //         });
+    //     }
+    // }
+
 }
 
 module.exports = UserController;

@@ -14,7 +14,7 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:3000',
+                url: 'http://localhost:3004',
                 description: 'Development server',
             },
         ],
@@ -124,6 +124,35 @@ function getUserPaths() {
                 responses: {
                     200: {
                         description: 'Successful response with all products.',
+                    },
+                    500: {
+                        description: 'Internal Server Error.',
+                    },
+                },
+            },
+        },
+        '/admin/complete-profile': {
+            put: {
+                summary: 'Complete user profile.',
+                operationId: 'completeProfile',
+                description: 'Endpoint to complete user profile.',
+                tags: ['User'],
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    shopName: { type: 'string' },
+                                },
+                                required: ['shopName'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'Successful response with completed user profile.',
                     },
                     500: {
                         description: 'Internal Server Error.',

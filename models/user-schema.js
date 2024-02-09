@@ -24,7 +24,12 @@ const UserSchema = new Schema({
     role: {
         type: String,
         enum: ['Seller', 'Customer'],
-    }
+    },
+    shopName: {
+        type: String,
+        required: false,
+        default: 'No Shop Name',
+    },
 });
 
 UserSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
