@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { checkAuth } = require('../utils/middleware');
+const { checkAuth, checkAuthor } = require('../utils/middleware');
 const productController = require('../controllers/product-controller');
 const userController = require('../controllers/user-controller');
 
@@ -9,6 +9,6 @@ router.route('/product')
 
 // Complete Profile
 router.route('/complete-profile')
-    .put(checkAuth, userController.completeProfile);
+    .put(checkAuth, checkAuthor, userController.completeProfile);
 
 module.exports = router;
