@@ -19,7 +19,7 @@ router.route('/')
     .post(checkAuth, checkAuthor, upload.single('image'), productController.createProduct)
 
 router.route('/:id')
-    .get(checkAuth, checkAuthor, checkOwnerProduct, productController.getProductById)
+    .get(productController.getProductById)
     .patch(checkAuth, checkAuthor, checkOwnerProduct, upload.single('image'), productController.updateProduct)
     .delete(checkAuth, checkAuthor, checkOwnerProduct, productController.deleteProduct)
 
