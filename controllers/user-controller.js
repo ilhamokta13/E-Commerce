@@ -76,22 +76,49 @@ class UserController {
 
     static async completeProfile(req, res, next) {
         try {
-            const { shopName } = req.body;
+            const { fullName, email, telp, role, shopName } = req.body;
             const userID = req.user.id;
-            const user = await User.findById(userID);
-            if (!user) {
-                const error = new Error('User not found');
-                error.statusCode = 401;
-                throw error;
-            }
-
-            user.shopName = shopName;
-            await user.save();
+            const user = await User.findByIdAndUpdate(userID, {
+                fullName,
+                email,
+                telp,
+                role,
+                shopName
+            });
 
             res.status(200).json({
                 error: false,
                 message: 'Success',
                 data: user
+            });
+        }
+        catch (error) {
+            res.status(500).json({
+                error: true,
+                message: error.message
+            });
+        }
+    }
+
+    static async resetPassword(req, res, next) {
+        try {
+            const { oldPassword, newPassword } = req.body;
+            console.log(req.body);
+            const userID = req.user.id;
+            const user = await
+                User.findById(userID);
+            const isValid = await bcrypt.compare(oldPassword, user.password);
+            if (!isValid) {
+                const error = new Error('Wrong password');
+                error.statusCode = 401;
+                throw error;
+            }
+            const hash = await bcrypt.hash(newPassword, 12);
+            user.password = hash;
+            await user.save();
+            res.status(200).json({
+                error: false,
+                message: 'Success update password'
             });
         }
         catch (error) {

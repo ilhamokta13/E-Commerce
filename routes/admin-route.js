@@ -9,6 +9,9 @@ router.route('/product')
 
 // Complete Profile
 router.route('/complete-profile')
-    .put(checkAuth, checkAuthor, userController.completeProfile);
+    .patch(checkAuth, checkAuthor, userController.completeProfile);
+
+
+
 
 module.exports = router;

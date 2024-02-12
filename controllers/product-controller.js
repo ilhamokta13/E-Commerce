@@ -75,7 +75,6 @@ class ProductController {
         }
     }
 
-
     static async getProductById(req, res) {
         try {
             const { id } = req.params;

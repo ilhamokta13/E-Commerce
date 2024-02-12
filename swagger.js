@@ -32,7 +32,9 @@ const swaggerOptions = {
         },
         paths: {
             ...getUserPaths(),
+            ...getAdmin(),
             ...getProductPaths(),
+            ...getCartPaths(),
             // ... (add other paths as needed)
         },
     },
@@ -115,12 +117,50 @@ function getUserPaths() {
                 },
             },
         },
+        '/user/reset-password': {
+            patch: {
+                summary: 'Reset user password.',
+                operationId: 'resetPassword',
+                description: 'Endpoint to reset user password.',
+                tags: ['User'],
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    oldPassword: { type: 'string' },
+                                    newPassword: { type: 'string' },
+                                },
+                                required: ['oldPassword', 'newPassword'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'Password reset successfully.',
+                    },
+                    401: {
+                        description: 'Invalid password.',
+                    },
+                    500: {
+                        description: 'Internal Server Error.',
+                    },
+                },
+            },
+        },
+    };
+}
+
+function getAdmin() {
+    return {
         '/admin/product': {
             get: {
                 summary: 'Get all products.',
                 operationId: 'getAdminProduct',
                 description: 'Endpoint to get all products for admin.',
-                tags: ['User'],
+                tags: ['Admin'],
                 responses: {
                     200: {
                         description: 'Successful response with all products.',
@@ -132,20 +172,24 @@ function getUserPaths() {
             },
         },
         '/admin/complete-profile': {
-            put: {
+            patch: {
                 summary: 'Complete user profile.',
                 operationId: 'completeProfile',
                 description: 'Endpoint to complete user profile.',
-                tags: ['User'],
+                tags: ['Admin'],
                 requestBody: {
                     content: {
                         'application/json': {
                             schema: {
                                 type: 'object',
                                 properties: {
+                                    fullName: { type: 'string' },
+                                    email: { type: 'string' },
+                                    telp: { type: 'string' },
+                                    role: { type: 'string', enum: ['Seller', 'Customer'] },
                                     shopName: { type: 'string' },
                                 },
-                                required: ['shopName'],
+                                required: ['fullName', 'email', 'telp', 'role', 'shopName'],
                             },
                         },
                     },
@@ -160,7 +204,7 @@ function getUserPaths() {
                 },
             },
         },
-    };
+    }
 }
 
 // Product-related paths
@@ -204,7 +248,7 @@ function getProductPaths() {
                                     releaseDate: { type: 'string' },
                                     location: { type: 'string' },
                                 },
-                                required: ['nameProduct', 'price', 'description', 'image', 'category', 'sellerID', 'releaseDate', 'location'],
+                                required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'location'],
                             },
                         },
                     },
@@ -322,5 +366,132 @@ function getProductPaths() {
                 },
             },
         },
+    };
+}
+function getCartPaths() {
+    return {
+        // Cart Routes
+        '/cart': {
+            get: {
+                summary: 'Get user\'s cart.',
+                operationId: 'getCart',
+                description: 'Endpoint to retrieve the cart of the authenticated user.',
+                tags: ['Cart'],
+                responses: {
+                    200: {
+                        description: 'Success. Returns the user\'s cart.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+            post: {
+                summary: 'Add product(s) to cart.',
+                operationId: 'addToCart',
+                description: 'Endpoint to add one or more products to the user\'s cart.',
+                tags: ['Cart'],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    productID: { type: 'array', items: { type: 'string' } },
+                                    quantity: { type: 'array', items: { type: 'integer' } },
+                                },
+                                required: ['productID', 'quantity'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'Success. Products added to cart.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+            patch: {
+                summary: 'Update quantity of product(s) in cart.',
+                operationId: 'updateCart',
+                description: 'Endpoint to update the quantity of one or more products in the user\'s cart.',
+                tags: ['Cart'],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    productID: { type: 'array', items: { type: 'string' } },
+                                    quantity: { type: 'array', items: { type: 'integer' } },
+                                },
+                                required: ['productID', 'quantity'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'Success. Cart updated.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+            delete: {
+                summary: 'Delete user\'s cart.',
+                operationId: 'deleteCart',
+                description: 'Endpoint to delete the cart of the authenticated user.',
+                tags: ['Cart'],
+                responses: {
+                    200: {
+                        description: 'Success. Cart deleted.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
+
+        // '/cart/decrease': {
+        //     post: {
+        //         summary: 'Decrease quantity of a product in cart.',
+        //         operationId: 'decreaseCartItem',
+        //         description: 'Endpoint to decrease the quantity of a product in the user\'s cart.',
+        //         tags: ['Cart'],
+        //         requestBody: {
+        //             required: true,
+        //             content: {
+        //                 'application/json': {
+        //                     schema: {
+        //                         type: 'object',
+        //                         properties: {
+        //                             productID: { type: 'string' },
+        //                         },
+        //                         required: ['productID'],
+        //                     },
+        //                 },
+        //             },
+        //         },
+        //         responses: {
+        //             200: {
+        //                 description: 'Success. Quantity decreased in cart.',
+        //             },
+        //             404: {
+        //                 description: 'Product not found in cart.',
+        //             },
+        //             500: {
+        //                 description: 'Internal server error.',
+        //             },
+        //         },
+        //     },
+        // },
     };
 }
