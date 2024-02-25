@@ -4,7 +4,6 @@ const { setupMiddleware } = require('./utils/middleware');
 const ExpressError = require('./utils/ExpressError');
 const swagger = require('./swagger')
 
-
 // Routes
 // const aaa = require('./routes/index-route');
 const userRoutes = require('./routes/user-route');
@@ -26,10 +25,10 @@ setupMiddleware(app);
 app.use('/api-docs', swagger.serve, swagger.setup);
 
 // Middleware for logging
-app.use((req, res, next) => {
-  console.log(req.url);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(req.url);
+//   next();
+// });
 
 // Routes
 // app.use('/', aaa);

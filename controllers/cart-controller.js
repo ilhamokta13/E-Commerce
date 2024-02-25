@@ -1,6 +1,5 @@
 const cart = require('../models/cart-schema');
 
-
 class cartController {
     static async getCart(req, res) {
         try {

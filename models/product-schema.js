@@ -25,9 +25,14 @@ const ProductSchema = new Schema({
     releaseDate: {
         type: Date,
     },
-    location: {
-        type: String,
+    latitude: {
+        type: Number,
+        required: true, // Depending on your requirements
     },
+    longitude: {
+        type: Number,
+        required: true, // Depending on your requirements
+    }
 });
 
 module.exports = mongoose.model('Product', ProductSchema);

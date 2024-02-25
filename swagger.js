@@ -227,7 +227,6 @@ function getProductPaths() {
                 },
             },
         },
-        // Product Routes
         '/product': {
             post: {
                 summary: 'Create a new product.',
@@ -246,9 +245,10 @@ function getProductPaths() {
                                     image: { type: 'string', format: 'binary' }, // Use 'binary' for file uploads
                                     category: { type: 'string' },
                                     releaseDate: { type: 'string' },
-                                    location: { type: 'string' },
+                                    latitude: { type: 'number' }, // Updated to latitude
+                                    longitude: { type: 'number' }, // Updated to longitude
                                 },
-                                required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'location'],
+                                required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'latitude', 'longitude'], // Updated to include latitude and longitude
                             },
                         },
                     },
@@ -266,6 +266,47 @@ function getProductPaths() {
                 },
             },
         },
+
+        //TODO : Add product BEFORE CHANGE
+        // // Product Routes
+        // '/product': {
+        //     post: {
+        //         summary: 'Create a new product.',
+        //         operationId: 'createProduct',
+        //         description: 'Endpoint to create a new product.',
+        //         tags: ['Product'],
+        //         requestBody: {
+        //             content: {
+        //                 'multipart/form-data': {
+        //                     schema: {
+        //                         type: 'object',
+        //                         properties: {
+        //                             nameProduct: { type: 'string' },
+        //                             price: { type: 'number' },
+        //                             description: { type: 'string' },
+        //                             image: { type: 'string', format: 'binary' }, // Use 'binary' for file uploads
+        //                             category: { type: 'string' },
+        //                             releaseDate: { type: 'string' },
+        //                             location: { type: 'string' },
+        //                         },
+        //                         required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'location'],
+        //                     },
+        //                 },
+        //             },
+        //         },
+        //         responses: {
+        //             201: {
+        //                 description: 'Product added successfully.',
+        //             },
+        //             401: {
+        //                 description: 'Seller ID not found.',
+        //             },
+        //             500: {
+        //                 description: 'Internal Server Error.',
+        //             },
+        //         },
+        //     },
+        // },
         // Product Routes
         '/product/{id}': {
             get: {
@@ -293,7 +334,6 @@ function getProductPaths() {
                     },
                 },
             },
-
             patch: {
                 summary: 'Update product by ID.',
                 operationId: 'updateProduct',
@@ -323,9 +363,10 @@ function getProductPaths() {
                                     image: { type: 'string', format: 'binary' }, // Define image as binary data
                                     category: { type: 'string' },
                                     releaseDate: { type: 'string', format: 'date' }, // Assuming releaseDate is a date
-                                    location: { type: 'string' },
+                                    latitude: { type: 'number' }, // Updated to latitude
+                                    longitude: { type: 'number' }, // Updated to longitude
                                 },
-                                required: ['nameProduct', 'price', 'description', 'category', 'releaseDate', 'location'],
+                                required: ['nameProduct', 'price', 'description', 'category', 'releaseDate', 'latitude', 'longitude'], // Updated to include latitude and longitude
                             },
                         },
                     },
@@ -339,6 +380,53 @@ function getProductPaths() {
                     },
                 },
             },
+
+            //TODO : Update product BEFORE CHANGE
+            // patch: {
+            //     summary: 'Update product by ID.',
+            //     operationId: 'updateProduct',
+            //     description: 'Endpoint to update product details by ID.',
+            //     tags: ['Product'],
+            //     parameters: [
+            //         {
+            //             name: 'id',
+            //             in: 'path',
+            //             required: true,
+            //             description: 'Product ID.',
+            //             schema: {
+            //                 type: 'string',
+            //             },
+            //         },
+            //     ],
+            //     requestBody: {
+            //         required: true,
+            //         content: {
+            //             'multipart/form-data': {
+            //                 schema: {
+            //                     type: 'object',
+            //                     properties: {
+            //                         nameProduct: { type: 'string' },
+            //                         price: { type: 'number' },
+            //                         description: { type: 'string' },
+            //                         image: { type: 'string', format: 'binary' }, // Define image as binary data
+            //                         category: { type: 'string' },
+            //                         releaseDate: { type: 'string', format: 'date' }, // Assuming releaseDate is a date
+            //                         location: { type: 'string' },
+            //                     },
+            //                     required: ['nameProduct', 'price', 'description', 'category', 'releaseDate', 'location'],
+            //                 },
+            //             },
+            //         },
+            //     },
+            //     responses: {
+            //         200: {
+            //             description: 'Successful response with updated product details.',
+            //         },
+            //         500: {
+            //             description: 'Internal Server Error.',
+            //         },
+            //     },
+            // },
 
             delete: {
                 summary: 'Delete product by ID.',
