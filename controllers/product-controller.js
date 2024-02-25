@@ -43,10 +43,19 @@ class ProductController {
 
     static async getAllProduct(req, res) {
         try {
-            const products = await Product.find().populate('sellerID');
+            // Check if there's a query parameter for search
+            const { search } = req.query;
+            let products;
+            if (search) {
+                // If search query parameter exists, perform search by search
+                products = await Product.find({ nameProduct: { $regex: new RegExp(search, 'i') } }).populate('sellerID');
+            } else {
+                // Otherwise, get all products
+                products = await Product.find().populate('sellerID');
+            }
             console.log(products);
             res.status(200).json({
-                message: 'Get all products',
+                message: 'Get products',
                 data: products
             });
         } catch (error) {
@@ -56,6 +65,24 @@ class ProductController {
             });
         }
     }
+
+
+    //TODO without search
+    // static async getAllProduct(req, res) {
+    //     try {
+    //         const products = await Product.find().populate('sellerID');
+    //         console.log(products);
+    //         res.status(200).json({
+    //             message: 'Get all products',
+    //             data: products
+    //         });
+    //     } catch (error) {
+    //         res.status(500).json({
+    //             error: true,
+    //             message: error.message
+    //         });
+    //     }
+    // }
 
     static async getAdminProduct(req, res) {
         try {

@@ -213,59 +213,89 @@ function getProductPaths() {
         // Product Routes
         '/product': {
             get: {
-                summary: 'Get all products.',
-                operationId: 'getAllProducts',
-                description: 'Endpoint to get all products.',
+                summary: 'Get products',
+                operationId: 'getAllProduct',
+                description: 'Endpoint to retrieve all products or search products by search contained in their names.',
                 tags: ['Product'],
+                parameters: [
+                    {
+                        name: 'search',
+                        in: 'query',
+                        description: 'search contained in the product names to search for.',
+                        required: false,
+                        schema: {
+                            type: 'string'
+                        }
+                    }
+                ],
                 responses: {
-                    200: {
-                        description: 'Successful response with all products.',
+                    '200': {
+                        description: 'Successful operation',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        message: {
+                                            type: 'string',
+                                            example: 'Get products'
+                                        },
+                                        data: {
+                                            type: 'array',
+                                            items: {
+                                                $ref: '#/components/schemas/Product'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
-                    500: {
-                        description: 'Internal Server Error.',
-                    },
-                },
-            },
+                    '500': {
+                        description: 'Internal server error'
+                    }
+                }
+            }
         },
-        '/product': {
-            post: {
-                summary: 'Create a new product.',
-                operationId: 'createProduct',
-                description: 'Endpoint to create a new product.',
-                tags: ['Product'],
-                requestBody: {
-                    content: {
-                        'multipart/form-data': {
-                            schema: {
-                                type: 'object',
-                                properties: {
-                                    nameProduct: { type: 'string' },
-                                    price: { type: 'number' },
-                                    description: { type: 'string' },
-                                    image: { type: 'string', format: 'binary' }, // Use 'binary' for file uploads
-                                    category: { type: 'string' },
-                                    releaseDate: { type: 'string' },
-                                    latitude: { type: 'number' }, // Updated to latitude
-                                    longitude: { type: 'number' }, // Updated to longitude
-                                },
-                                required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'latitude', 'longitude'], // Updated to include latitude and longitude
+
+        post: {
+            summary: 'Create a new product.',
+            operationId: 'createProduct',
+            description: 'Endpoint to create a new product.',
+            tags: ['Product'],
+            requestBody: {
+                content: {
+                    'multipart/form-data': {
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                nameProduct: { type: 'string' },
+                                price: { type: 'number' },
+                                description: { type: 'string' },
+                                image: { type: 'string', format: 'binary' }, // Use 'binary' for file uploads
+                                category: { type: 'string' },
+                                releaseDate: { type: 'string' },
+                                latitude: { type: 'number' }, // Updated to latitude
+                                longitude: { type: 'number' }, // Updated to longitude
                             },
+                            required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'latitude', 'longitude'], // Updated to include latitude and longitude
                         },
                     },
                 },
-                responses: {
-                    201: {
-                        description: 'Product added successfully.',
-                    },
-                    401: {
-                        description: 'Seller ID not found.',
-                    },
-                    500: {
-                        description: 'Internal Server Error.',
-                    },
+            },
+            responses: {
+                201: {
+                    description: 'Product added successfully.',
+                },
+                401: {
+                    description: 'Seller ID not found.',
+                },
+                500: {
+                    description: 'Internal Server Error.',
                 },
             },
         },
+
 
         //TODO : Add product BEFORE CHANGE
         // // Product Routes
