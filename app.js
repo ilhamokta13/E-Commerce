@@ -10,6 +10,7 @@ const userRoutes = require('./routes/user-route');
 const productRoutes = require('./routes/product-route');
 const adminRoutes = require('./routes/admin-route');
 const cartRoutes = require('./routes/cart-route');
+const transaksiRoutes = require('./routes/transaksi-route');
 
 
 const app = express();
@@ -36,6 +37,7 @@ app.use('/user', userRoutes);
 app.use('/product', productRoutes);
 app.use('/cart', cartRoutes);
 app.use('/admin', adminRoutes);
+app.use('/transaksi', transaksiRoutes);
 
 // Error route
 app.all('*', (req, res, next) => {

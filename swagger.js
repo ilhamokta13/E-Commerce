@@ -35,6 +35,7 @@ const swaggerOptions = {
             ...getAdmin(),
             ...getProductPaths(),
             ...getCartPaths(),
+            ...getTransaksiPaths(),
             // ... (add other paths as needed)
         },
     },
@@ -611,5 +612,59 @@ function getCartPaths() {
         //         },
         //     },
         // },
+    };
+}
+
+function getTransaksiPaths() {
+    return {
+        // Transaksi Routes
+        '/transaksi/create': {
+            post: {
+                summary: 'Create a new transaksi.',
+                operationId: 'createTransaksi',
+                description: 'Endpoint to create a new transaksi.',
+                tags: ['Transaksi'],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    id_barang: { type: 'array', items: { type: 'string' } },
+                                    jumlah: { type: 'array', items: { type: 'integer' } },
+                                    total_harga: { type: 'number' },
+                                },
+                                required: ['id_barang', 'jumlah', 'total_harga'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    201: {
+                        description: 'Transaksi berhasil dibuat.',
+                    },
+                    500: {
+                        description: 'Internal Server Error.',
+                    },
+                },
+            },
+        },
+        '/transaksi/get': {
+            get: {
+                summary: 'Get all transaksi.',
+                operationId: 'getAllTransaksi',
+                description: 'Endpoint to get all transaksi for the authenticated user.',
+                tags: ['Transaksi'],
+                responses: {
+                    200: {
+                        description: 'Berhasil menampilkan data transaksi.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
     };
 }
