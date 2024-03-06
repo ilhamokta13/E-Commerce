@@ -19,6 +19,11 @@ const TransaksiSchema = new Schema({
             type: Number,
             required: true,
         },
+        status: {
+            type: String,
+            enum: ['pending', 'paid', 'failed'],
+            default: 'pending',
+        },
     }],
     total: {
         type: Number,
