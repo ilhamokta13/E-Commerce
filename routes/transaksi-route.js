@@ -9,6 +9,9 @@ router.route('/create')
 router.route('/get')
     .get(transaksiController.getAllTransaksi)
 
+router.route('/update')
+    .post(transaksiController.updateStatus);
+
 // router.route('/get/admin')
 //     .get(transaksiController.getTransaksiAdmin)
 

@@ -1,3 +1,4 @@
+const { response } = require('express');
 const Product = require('../models/product-schema');
 const Transaksi = require('../models/transaksi-schema');
 const axios = require('axios');
@@ -55,11 +56,6 @@ class TransaksiController {
         const populatedTransaksi = await Transaksi.findById(newTransaksi._id).populate('Products.ProductID');
 
         await TransaksiController.createMidtransTransaction(res, populatedTransaksi);
-        // res.status(201).json({
-        //     message: 'Transaksi berhasil dibuat',
-        //     data: newTransaksi,
-        //     midtransResponse: midtransResponse
-        // });
     }
 
     static async createMidtransTransaction(res, transaksiData) {
@@ -90,15 +86,10 @@ class TransaksiController {
             console.log('items:', items);
             console.log('transaksiData:', transaksiData._id.toString());
 
-
-            // const grossAmount = items.reduce((total, item) => total + (item.price * item.quantity), 0);
-            // console.log('grossAmount:', grossAmount);
-
             const total = items.reduce((total, item) => total + (item.price * item.quantity), 0);
-            console.log('ORDER_UNIQUE', transaksiData.kode_transaksi.toString());
 
             const transactionDetails = {
-                order_id: transaksiData.kode_transaksi.toString() + '-' + Date.now(),
+                order_id: transaksiData.kode_transaksi.toString(),
                 gross_amount: total
             };
             console.log('transactionDetails:', transactionDetails);
@@ -123,17 +114,39 @@ class TransaksiController {
                     console.error('Error creating Midtrans transaction:', error);
                     throw error;
                 });
-
-            // const response = await axios.post(midtransBaseUrl, requestBody, { headers });
-
-            // return res.status(201).json({
-            //     message: 'Transaksi berhasil dibuat',
-            //     data: transaksiData,
-            //     midtransResponse: response.data
-            // });
         } catch (error) {
             console.error('Error creating Midtrans transaction:', error);
             throw error;
+        }
+    }
+
+    async updateStatus(req, res) {
+        const request = req.body;
+        const order_id = request.order_id;
+
+        const transaksi = await Transaksi.findOne({ kode_transaksi: order_id });
+
+        console.log('transaksi:');
+
+        if (transaksi && request.transaction_status === 'settlement') {
+            if (request.transaction_status === 'settlement') {
+                transaksi.status = 'Paid';
+            } else if (request.transaction_status === 'expire') {
+                transaksi.status = 'Expired';
+            } else {
+                transaksi.status = 'Failed';
+            };
+
+            await transaksi.save();
+            res.status(200).json({
+                message: 'Berhasil update status transaksi',
+                data: transaksi
+            });
+        }
+        else {
+            res.status(400).json({
+                message: 'Transaksi tidak ditemukan'
+            });
         }
     }
 
@@ -143,8 +156,47 @@ class TransaksiController {
             message: 'Berhasil menampilkan data transaksi',
             data: transaksi
         });
-
     }
+
+    async getTransaksi(req, res) {
+        try {
+            const user = req.user._id || '65b93b4f3b4839656e9c05b0';
+
+            // Mengambil transaksi dari database dan memuat status transaksi
+            const transaksi = await Transaksi.find({}).populate('Products.ProductID').select('+status');
+
+            // Membuat array kosong untuk menampung produk yang dimiliki oleh pengguna
+            const userProducts = [];
+
+            // Memfilter produk yang dimiliki oleh pengguna
+            transaksi.forEach(trx => {
+                trx.Products.forEach(product => {
+                    if (product.ProductID.sellerID.toString() === user) {
+                        userProducts.push({
+                            transaksiId: trx._id,
+                            productId: product.ProductID._id,
+                            productName: product.ProductID.nameProduct,
+                            price: product.ProductID.price,
+                            Image: product.ProductID.image,
+                            quantity: product.quantity,
+                            total: trx.total,
+                            status: trx.status
+                        });
+                    }
+                });
+            });
+
+            // Mengirimkan data transaksi beserta status
+            res.status(200).json({
+                message: 'Berhasil menampilkan data transaksi',
+                data: userProducts
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            res.status(500).json({ error: 'Gagal memproses permintaan' });
+        }
+    }
+
 
     // async getTransaksiAdmin(req, res) {
     //     // const user = req.user || '65b93b4f3b4839656e9c05b0';

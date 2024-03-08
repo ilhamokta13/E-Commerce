@@ -36,7 +36,7 @@ const TransaksiSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', , 'Process', 'Delivery', 'Success', 'Failed'],
+        enum: ['Pending', 'Paid', 'On Delivery', 'Delivered', 'Expired', 'Failed'],
         default: 'Pending',
     },
 });

@@ -205,6 +205,22 @@ function getAdmin() {
                 },
             },
         },
+        '/admin/transaksi': {
+            get: {
+                summary: 'Get all transaksi.',
+                operationId: 'getTransaksi',
+                description: 'Endpoint to get all transaksi for the authenticated user.',
+                tags: ['Admin'],
+                responses: {
+                    200: {
+                        description: 'Berhasil menampilkan data transaksi.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
     }
 }
 
