@@ -41,6 +41,7 @@ class TransaksiController {
         })
 
         const newTransaksi = new Transaksi({
+            kode_transaksi: 'TRX-' + Date.now() + Math.floor(Math.random() * 1000),
             user: user,
             Products: products.map((product, index) => ({
                 ProductID: product._id,
@@ -90,17 +91,16 @@ class TransaksiController {
             console.log('transaksiData:', transaksiData._id.toString());
 
 
-            const grossAmount = items.reduce((total, item) => total + (item.price * item.quantity), 0);
-            console.log('grossAmount:', grossAmount);
+            // const grossAmount = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+            // console.log('grossAmount:', grossAmount);
 
-            const order_id = `${transaksiData._id}${Date.now()}`;
-
-            console.log('order_id:', order_id);
+            const total = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+            console.log('ORDER_UNIQUE', transaksiData.kode_transaksi.toString());
 
             const requestBody = {
                 transaction_details: {
-                    order_id: order_id,
-                    gross_amount: grossAmount
+                    order_id: 'CustOrder-' + transaksiData._id.toString(),
+                    gross_amount: total
                 },
                 item_details: items,
             };
