@@ -97,31 +97,40 @@ class TransaksiController {
             const total = items.reduce((total, item) => total + (item.price * item.quantity), 0);
             console.log('ORDER_UNIQUE', transaksiData.kode_transaksi.toString());
 
+            const transactionDetails = {
+                order_id: transaksiData.kode_transaksi.toString() + '-' + Date.now(),
+                gross_amount: total
+            };
+            console.log('transactionDetails:', transactionDetails);
+
             const requestBody = {
-                transaction_details: {
-                    order_id: 'CustOrder-' + transaksiData._id.toString(),
-                    gross_amount: total
-                },
+                transaction_details: transactionDetails,
                 item_details: items,
             };
+
             console.log('requestBody:', requestBody);
+
             snap.createTransaction(requestBody)
                 .then((transaction) => {
                     console.log('transaction:', transaction);
-                    return transaction;
-                })
-                .catch((error) => {
+                    res.status(201).json({
+                        message: 'Transaksi berhasil dibuat',
+                        data: transaksiData,
+                        midtransResponse: transaction
+                    });
+                }
+                ).catch((error) => {
                     console.error('Error creating Midtrans transaction:', error);
                     throw error;
                 });
 
-            const response = await axios.post(midtransBaseUrl, requestBody, { headers });
+            // const response = await axios.post(midtransBaseUrl, requestBody, { headers });
 
-            return res.status(201).json({
-                message: 'Transaksi berhasil dibuat',
-                data: transaksiData,
-                midtransResponse: response.data
-            });
+            // return res.status(201).json({
+            //     message: 'Transaksi berhasil dibuat',
+            //     data: transaksiData,
+            //     midtransResponse: response.data
+            // });
         } catch (error) {
             console.error('Error creating Midtrans transaction:', error);
             throw error;
