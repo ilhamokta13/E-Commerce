@@ -38,12 +38,8 @@ class TransaksiController {
             _id: {
                 $in: id_barang
             }
-        });
-        console.log(products.map((product, index) => ({
-            productID: product._id,
-            quantity: jumlah[index],
-            payment_status: 'pending'
-        })));
+        })
+
         const newTransaksi = new Transaksi({
             user: user,
             Products: products.map((product, index) => ({
@@ -54,15 +50,18 @@ class TransaksiController {
         });
         await newTransaksi.save();
 
-        const midtransResponse = await TransaksiController.createMidtransTransaction(newTransaksi);
-        res.status(201).json({
-            message: 'Transaksi berhasil dibuat',
-            data: newTransaksi,
-            midtransResponse: midtransResponse
-        });
+        // Populate Products field in the newly created Transaksi
+        const populatedTransaksi = await Transaksi.findById(newTransaksi._id).populate('Products.ProductID');
+
+        await TransaksiController.createMidtransTransaction(res, populatedTransaksi);
+        // res.status(201).json({
+        //     message: 'Transaksi berhasil dibuat',
+        //     data: newTransaksi,
+        //     midtransResponse: midtransResponse
+        // });
     }
 
-    static async createMidtransTransaction(transaksiData) {
+    static async createMidtransTransaction(res, transaksiData) {
         try {
             const midtransBaseUrl = 'https://app.sandbox.midtrans.com/snap/v1/transactions';
             const midtransServerKey = 'SB-Mid-server-epMxg_ncWANTgBMQ_es5eIHn';
@@ -78,30 +77,32 @@ class TransaksiController {
                 'Authorization': `Basic ${Buffer.from(midtransServerKey + ':').toString('base64')}`
             };
 
+            // console.log('transaksiData:', transaksiData.Products);
+
             const items = transaksiData.Products.map(product => ({
-                id: product.ProductID.toString(),
-                price: product.price,
+                id: product.ProductID._id,
+                price: product.ProductID.price,
                 quantity: product.quantity,
-                name: product.name
+                name: product.ProductID.nameProduct
             }));
+
+            console.log('items:', items);
+            console.log('transaksiData:', transaksiData._id.toString());
+
+
+            const grossAmount = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+            console.log('grossAmount:', grossAmount);
+
+            const order_id = `${transaksiData._id}${Date.now()}`;
+
+            console.log('order_id:', order_id);
 
             const requestBody = {
                 transaction_details: {
-                    order_id: transaksiData._id, // Ganti dengan ID transaksi Anda
-                    gross_amount: 1000 // Ganti dengan total harga transaksi Anda
+                    order_id: order_id,
+                    gross_amount: grossAmount
                 },
-                item_details: [{
-                    id: transaksiData._id,
-                    price: transaksiData.total,
-                    quantity: 1,
-                    name: 'Pembayaraaaan111'
-                },
-                {
-                    id: transaksiData._id,
-                    price: transaksiData.total,
-                    quantity: 1,
-                    name: 'Pembayaraaaan22'
-                },]
+                item_details: items,
             };
             console.log('requestBody:', requestBody);
             snap.createTransaction(requestBody)
@@ -114,25 +115,13 @@ class TransaksiController {
                     throw error;
                 });
 
-
-            // const requestBody = {
-            //     transaction_details: {
-            //         order_id: transaksiData._id, // Ganti dengan ID transaksi Anda
-            //         gross_amount: transaksiData.total // Ganti dengan total harga transaksi Anda
-            //     },
-            //     item_details: items,
-            // customer_details: {
-            //     // Ganti dengan informasi pelanggan jika diperlukan
-            // },
-            // credit_card: {
-            //     // Ganti dengan konfigurasi kartu kredit jika diperlukan
-            // },
-            // // Tambahkan konfigurasi lainnya sesuai kebutuhan
-
-
             const response = await axios.post(midtransBaseUrl, requestBody, { headers });
 
-            return response.data;
+            return res.status(201).json({
+                message: 'Transaksi berhasil dibuat',
+                data: transaksiData,
+                midtransResponse: response.data
+            });
         } catch (error) {
             console.error('Error creating Midtrans transaction:', error);
             throw error;
