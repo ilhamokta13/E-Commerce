@@ -131,10 +131,19 @@ class TransaksiController {
         if (transaksi && request.transaction_status === 'settlement') {
             if (request.transaction_status === 'settlement') {
                 transaksi.status = 'Paid';
+                transaksi.Products.forEach(product => {
+                    product.status = 'Paid';
+                });
             } else if (request.transaction_status === 'expire') {
                 transaksi.status = 'Expired';
+                transaksi.Products.forEach(product => {
+                    product.status = 'Expired';
+                });
             } else {
                 transaksi.status = 'Failed';
+                transaksi.Products.forEach(product => {
+                    product.status = 'Failed';
+                });
             };
 
             await transaksi.save();
@@ -196,6 +205,67 @@ class TransaksiController {
             res.status(500).json({ error: 'Gagal memproses permintaan' });
         }
     }
+
+
+    async getTransaksiUser(req, res) {
+        const user = req.user.id;
+        console.log('user:', user);
+        const transaksi = await Transaksi.find({ user: user }).select('-status').populate('Products.ProductID');
+        res.status(200).json({
+            message: 'Berhasil menampilkan data transaksi Customer',
+            data: transaksi
+        });
+    }
+
+    async updateStatus(req, res) {
+        try {
+            const { productID, status, kode_transaksi } = req.body;
+            const transaksi = await Transaksi.findOne({
+                $and: [
+                    { kode_transaksi: kode_transaksi },
+                    { 'Products.ProductID': productID }
+                ]
+            });
+
+            if (!transaksi) {
+                return res.status(400).json({
+                    message: 'Transaksi tidak ditemukan'
+                });
+            }
+            console.log('transaksi:', transaksi);
+            transaksi.Products.forEach(product => {
+                if (product.ProductID.toString() === productID) {
+                    console.log('product:', product.status);
+                    product.status = status;
+                    console.log('Transaksi Status', transaksi.status);
+                    console.log(status);
+                    console.log('product:', product.status);
+                }
+            });
+            await transaksi.save();
+            res.status(200).json({
+                message: 'Berhasil update status transaksi',
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            res.status(500).json({ error: 'Gagal memproses permintaan' });
+        }
+    }
+
+    async getTransaksiAdmin(req, res) {
+        const adminUserID = req.user.id;
+        // const transaksi = await Transaksi.find({ 'Products.ProductID.sellerID': adminUserID }).populate('Products.ProductID');
+        const transaksi = await Transaksi.find({}).select('-status').populate('Products.ProductID').populate('user');
+
+        const adminTransaksi = transaksi.filter(trx => trx.Products.some(product => product.ProductID.sellerID.toString() === adminUserID));
+
+        res.status(200).json({
+            message: 'Berhasil menampilkan data transaksi admin',
+            data: adminTransaksi
+        });
+    }
+
+
 
 
     // async getTransaksiAdmin(req, res) {

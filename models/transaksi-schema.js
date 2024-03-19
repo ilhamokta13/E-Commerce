@@ -26,7 +26,7 @@ const TransaksiSchema = new Schema({
         },
         status: {
             type: String,
-            enum: ['pending', 'paid', 'failed'],
+            enum: ['Pending', 'Paid', 'On Delivery', 'Delivered', 'Expired', 'Failed'],
             default: 'pending',
         },
     }],

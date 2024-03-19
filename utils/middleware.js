@@ -27,6 +27,7 @@ const checkAuth = (req, res, next) => {
 
     const payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.SECRET_KEY);
     req.user = payload;
+    console.log(req.user);
     next();
   } else {
     res.status(401).json({

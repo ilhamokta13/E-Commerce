@@ -23,4 +23,7 @@ router.route('/:id')
     .patch(checkAuth, checkAuthor, checkOwnerProduct, upload.single('image'), productController.updateProduct)
     .delete(checkAuth, checkAuthor, checkOwnerProduct, productController.deleteProduct)
 
+router.route('/shop/:shopName')
+    .get(productController.getProductsByshopName);
+
 module.exports = router;

@@ -273,46 +273,46 @@ function getProductPaths() {
                     }
                 }
             }
-        },
+            ,
 
-        post: {
-            summary: 'Create a new product.',
-            operationId: 'createProduct',
-            description: 'Endpoint to create a new product.',
-            tags: ['Product'],
-            requestBody: {
-                content: {
-                    'multipart/form-data': {
-                        schema: {
-                            type: 'object',
-                            properties: {
-                                nameProduct: { type: 'string' },
-                                price: { type: 'number' },
-                                description: { type: 'string' },
-                                image: { type: 'string', format: 'binary' }, // Use 'binary' for file uploads
-                                category: { type: 'string' },
-                                releaseDate: { type: 'string' },
-                                latitude: { type: 'number' }, // Updated to latitude
-                                longitude: { type: 'number' }, // Updated to longitude
+            post: {
+                summary: 'Create a new product.',
+                operationId: 'createProduct',
+                description: 'Endpoint to create a new product.',
+                tags: ['Product'],
+                requestBody: {
+                    content: {
+                        'multipart/form-data': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    nameProduct: { type: 'string' },
+                                    price: { type: 'number' },
+                                    description: { type: 'string' },
+                                    image: { type: 'string', format: 'binary' }, // Use 'binary' for file uploads
+                                    category: { type: 'string' },
+                                    releaseDate: { type: 'string' },
+                                    latitude: { type: 'number' }, // Updated to latitude
+                                    longitude: { type: 'number' }, // Updated to longitude
+                                },
+                                required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'latitude', 'longitude'], // Updated to include latitude and longitude
                             },
-                            required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'latitude', 'longitude'], // Updated to include latitude and longitude
                         },
                     },
                 },
-            },
-            responses: {
-                201: {
-                    description: 'Product added successfully.',
-                },
-                401: {
-                    description: 'Seller ID not found.',
-                },
-                500: {
-                    description: 'Internal Server Error.',
+                responses: {
+                    201: {
+                        description: 'Product added successfully.',
+                    },
+                    401: {
+                        description: 'Seller ID not found.',
+                    },
+                    500: {
+                        description: 'Internal Server Error.',
+                    },
                 },
             },
         },
-
 
         //TODO : Add product BEFORE CHANGE
         // // Product Routes
@@ -501,7 +501,35 @@ function getProductPaths() {
                 },
             },
         },
-    };
+
+        '/product/shop/{shopName}': {
+            get: {
+                summary: 'Get products by shop name.',
+                operationId: 'getProductsByshopName',
+                description: 'Endpoint to get products by shop name.',
+                tags: ['Product'],
+                parameters: [
+                    {
+                        name: 'shopName',
+                        in: 'path',
+                        required: true,
+                        description: 'Shop name.',
+                        schema: {
+                            type: 'string',
+                        },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: 'Successful response with products by shop name.',
+                    },
+                    500: {
+                        description: 'Internal Server Error.',
+                    },
+                },
+            },
+        },
+    }
 }
 function getCartPaths() {
     return {
@@ -675,6 +703,70 @@ function getTransaksiPaths() {
                 responses: {
                     200: {
                         description: 'Berhasil menampilkan data transaksi.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
+        '/transaksi/getUserTransaksi': {
+            get: {
+                summary: 'Get user\'s transaksi.',
+                operationId: 'getTransaksiUser',
+                description: 'Endpoint to get all transaksi for the authenticated user.',
+                tags: ['Transaksi'],
+                responses: {
+                    200: {
+                        description: 'Berhasil menampilkan data transaksi.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
+        '/transaksi/getAdminTransaksi': {
+            get: {
+                summary: 'Get admin\'s transaksi.',
+                operationId: 'getTransaksiAdmin',
+                description: 'Endpoint to get all transaksi for the authenticated user.',
+                tags: ['Transaksi'],
+                responses: {
+                    200: {
+                        description: 'Berhasil menampilkan data transaksi.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
+        '/transaksi/update': {
+            post: {
+                summary: 'Update status transaksi.',
+                operationId: 'updateStatus',
+                description: 'Endpoint to update status transaksi.',
+                tags: ['Transaksi'],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    kode_transaksi: { type: 'string' },
+                                    productID: { type: 'string' },
+                                    status: { enum: ['Pending', 'Paid', 'On Delivery', 'Delivered', 'Expired', 'Failed'] },
+                                },
+                                required: ['kode_transaksi', 'productID', 'status'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'Berhasil mengubah status transaksi.',
                     },
                     500: {
                         description: 'Internal server error.',
