@@ -774,5 +774,21 @@ function getTransaksiPaths() {
                 },
             },
         },
+        '/transaksi/getPendapatan': {
+            get: {
+                summary: 'Get pendapatan masing-masing toko.',
+                operationId: 'getPendapatanMasingMasingToko',
+                description: 'Endpoint to get pendapatan masing-masing toko.',
+                tags: ['Transaksi'],
+                responses: {
+                    200: {
+                        description: 'Berhasil menampilkan pendapatan masing-masing toko.',
+                    },
+                    500: {
+                        description: 'Internal server error.',
+                    },
+                },
+            },
+        },
     };
 }

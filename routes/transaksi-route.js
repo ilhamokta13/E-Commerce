@@ -21,6 +21,9 @@ router.route('/getAdminTransaksi')
 router.route('/updateStatus')
     .patch(checkAuth, transaksiController.updateStatus);
 
+router.route('/getPendapatan')
+    .get(transaksiController.getPendapatanMasingMasingToko)
+
 
 // router.route('/get/admin')
 //     .get(transaksiController.getTransaksiAdmin)

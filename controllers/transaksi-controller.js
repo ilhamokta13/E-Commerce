@@ -266,6 +266,64 @@ class TransaksiController {
     }
 
 
+    async getPendapatanMasingMasingToko(req, res) {
+        try {
+            const pendapatanDanTransaksiPerToko = await Transaksi.aggregate([
+                {
+                    $unwind: '$Products'
+                },
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: 'Products.ProductID',
+                        foreignField: '_id',
+                        as: 'Product'
+                    }
+                },
+                {
+                    $unwind: '$Product'
+                },
+                {
+                    $group: {
+                        _id: '$Product.sellerID',
+                        totalPendapatan: { $sum: '$total' },
+                        transaksi: { $push: '$$ROOT' } // Menyertakan seluruh dokumen transaksi
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: '_id',
+                        foreignField: '_id',
+                        as: 'Seller'
+                    }
+                },
+                {
+                    $unwind: '$Seller'
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        sellerID: '$Seller._id',
+                        sellerName: '$Seller.fullName',
+                        totalPendapatan: 1,
+                        transaksi: 1 // Menyertakan list transaksi
+                    }
+                }
+            ]);
+
+
+            // Mengirimkan hasil grouping sebagai respons
+            res.status(200).json({
+                message: 'Berhasil menghitung pendapatan masing-masing toko',
+                data: pendapatanDanTransaksiPerToko
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            res.status(500).json({ error: 'Gagal memproses permintaan' });
+        }
+    }
+
 
 
     // async getTransaksiAdmin(req, res) {
