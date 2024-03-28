@@ -9,7 +9,7 @@ router.route('/create')
 router.route('/get')
     .get(transaksiController.getAllTransaksi)
 
-router.route('/update') //Auto update status for Midtrans
+router.route('/update')
     .post(transaksiController.updateStatus);
 
 router.route('/getUserTransaksi')
@@ -19,7 +19,7 @@ router.route('/getAdminTransaksi')
     .get(checkAuth, transaksiController.getTransaksiAdmin)
 
 router.route('/updateStatus')
-    .patch(checkAuth, transaksiController.updateStatus);
+    .patch(checkAuth, transaksiController.updateStatuss);
 
 router.route('/getPendapatan')
     .get(transaksiController.getPendapatanMasingMasingToko)

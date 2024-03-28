@@ -83,27 +83,20 @@ class TransaksiController {
                 name: product.ProductID.nameProduct
             }));
 
-            console.log('items:', items);
-            console.log('transaksiData:', transaksiData._id.toString());
-
             const total = items.reduce((total, item) => total + (item.price * item.quantity), 0);
 
             const transactionDetails = {
                 order_id: transaksiData.kode_transaksi.toString(),
                 gross_amount: total
             };
-            console.log('transactionDetails:', transactionDetails);
 
             const requestBody = {
                 transaction_details: transactionDetails,
                 item_details: items,
             };
 
-            console.log('requestBody:', requestBody);
-
             snap.createTransaction(requestBody)
                 .then((transaction) => {
-                    console.log('transaction:', transaction);
                     res.status(201).json({
                         message: 'Transaksi berhasil dibuat',
                         data: transaksiData,
@@ -111,11 +104,9 @@ class TransaksiController {
                     });
                 }
                 ).catch((error) => {
-                    console.error('Error creating Midtrans transaction:', error);
                     throw error;
                 });
         } catch (error) {
-            console.error('Error creating Midtrans transaction:', error);
             throw error;
         }
     }
@@ -125,8 +116,6 @@ class TransaksiController {
         const order_id = request.order_id;
 
         const transaksi = await Transaksi.findOne({ kode_transaksi: order_id });
-
-        console.log('transaksi:');
 
         if (transaksi && request.transaction_status === 'settlement') {
             if (request.transaction_status === 'settlement') {
@@ -209,7 +198,6 @@ class TransaksiController {
 
     async getTransaksiUser(req, res) {
         const user = req.user.id;
-        console.log('user:', user);
         const transaksi = await Transaksi.find({ user: user }).select('-status').populate('Products.ProductID');
         res.status(200).json({
             message: 'Berhasil menampilkan data transaksi Customer',
@@ -217,7 +205,7 @@ class TransaksiController {
         });
     }
 
-    async updateStatus(req, res) {
+    async updateStatuss(req, res) {
         try {
             const { productID, status, kode_transaksi } = req.body;
             const transaksi = await Transaksi.findOne({
@@ -232,14 +220,9 @@ class TransaksiController {
                     message: 'Transaksi tidak ditemukan'
                 });
             }
-            console.log('transaksi:', transaksi);
             transaksi.Products.forEach(product => {
                 if (product.ProductID.toString() === productID) {
-                    console.log('product:', product.status);
                     product.status = status;
-                    console.log('Transaksi Status', transaksi.status);
-                    console.log(status);
-                    console.log('product:', product.status);
                 }
             });
             await transaksi.save();
