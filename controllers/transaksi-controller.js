@@ -182,6 +182,9 @@ class TransaksiController {
     async updateStatuss(req, res) {
         try {
             const { productID, status, kode_transaksi } = req.body;
+            console.log('productID:', productID);
+            console.log('status:', status);
+            console.log('kode_transaksi:', kode_transaksi);
             const transaksi = await Transaksi.findOne({
                 $and: [
                     { kode_transaksi: kode_transaksi },

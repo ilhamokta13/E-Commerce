@@ -742,8 +742,8 @@ function getTransaksiPaths() {
                 },
             },
         },
-        '/transaksi/update': {
-            post: {
+        '/transaksi/updateStatus': {
+            patch: {
                 summary: 'Update status transaksi.',
                 operationId: 'updateStatus',
                 description: 'Endpoint to update status transaksi.',
