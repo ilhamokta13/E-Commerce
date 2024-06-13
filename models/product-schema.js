@@ -32,7 +32,21 @@ const ProductSchema = new Schema({
     longitude: {
         type: Number,
         required: true, // Depending on your requirements
-    }
+    },
+    offers: [{
+        buyerID: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        price: {
+            type: Number,
+        },
+        status: {
+            type: String,
+            enum: ['pending', 'accepted', 'rejected'],
+            default: 'pending'
+        }
+    }]
 });
 
 module.exports = mongoose.model('Product', ProductSchema);

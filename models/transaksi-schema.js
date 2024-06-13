@@ -24,10 +24,14 @@ const TransaksiSchema = new Schema({
             type: Number,
             required: true,
         },
+        
         status: {
             type: String,
-            enum: ['Pending', 'Paid', 'On Delivery', 'Delivered', 'Expired', 'Failed'],
+            enum: ['Dikemas', 'Dikirim', 'Selesai', 'Dibatalkan', 'Paid', 'Pending', 'CashOnDelivery'],
             default: 'Pending',
+        },
+        image: {
+            type: String,
         },
     }],
     total: {
@@ -36,9 +40,31 @@ const TransaksiSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Paid', 'On Delivery', 'Delivered', 'Expired', 'Failed'],
+        enum: ['Dikemas', 'Dikirim', 'Selesai', 'Dibatalkan', 'Paid', 'Pending', 'CashOnDelivery'],
         default: 'Pending',
     },
+
+
+    shippingCost: {
+        type: Number,
+        default: 0,
+    },
+    destination: {
+        latitude: {
+            type: Number,
+        
+        },
+        longitude: {
+            type: Number,
+        },
+    },
+
+  
+
+   
+
+
+    
 });
 
 module.exports = mongoose.model('Transaksi', TransaksiSchema);
