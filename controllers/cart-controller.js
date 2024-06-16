@@ -21,12 +21,16 @@ class cartController {
     //     }
     // }
 
+    //Penggunaan blok try-catch untuk menangani kesalahan yang mungkin terjadi selama eksekusi fungsi.
     static async getCart(req, res) {
         try {
+            //Fungsi mengekstrak ID pengguna dari objek req.user, yang diasumsikan sudah diisi oleh middleware autentikasi.
             const userID = req.user.id;
+            //Fungsi mencari keranjang belanja pengguna berdasarkan userID. Metode populate('products.productID') digunakan untuk memuat informasi detail produk dalam keranjang.
             const userCart = await cart.findOne({ userID: userID }).populate('products.productID');
             
             // Ubah data ke dalam format list
+            //Data keranjang belanja yang ditemukan diubah menjadi format objek responseData.
             const responseData = {
                 destination: userCart.destination,
                 _id: userCart._id,
@@ -35,11 +39,12 @@ class cartController {
                 shippingCost: userCart.shippingCost,
                 __v: userCart.__v
             };
-    
+            //Data responseData dibungkus dalam list dan dikirimkan sebagai respons dengan status kode 200 beserta pesan sukses.
             res.status(200).json({
                 message: 'Get cart',
                 data: [responseData] // Bungkus data dalam list
             });
+            //Jika terjadi kesalahan selama eksekusi fungsi, blok catch akan menangkapnya dan mengirimkan respons dengan status kode 500 beserta pesan error.
         } catch (error) {
             res.status(500).json({
                 error: true,
@@ -160,10 +165,6 @@ class cartController {
         }
     }
     
-
-
-
-   
     
     static async decreaseCartItem(req, res) {
         const userID = req.user.id;
@@ -211,31 +212,36 @@ class cartController {
             });
         }
     }
-
+    //Metode ini digunakan untuk memperbarui keranjang belanja pengguna yang terautentikasi dengan mengubah jumlah produk atau menghapus produk dari keranjang jika jumlahnya nol.
     static async updateCart(req, res) {
         try {
+            //Fungsi mengekstrak ID pengguna dari objek req.user dan mengambil productID serta quantity dari request body.
             const userID = req.user.id;
             const { productID, quantity } = req.body;
-
+            //Fungsi mencari keranjang belanja pengguna berdasarkan userID.
             const userCart = await cart.findOne({ userID: userID });
 
             if (userCart) {
+                //Mencari indeks produk dalam keranjang yang sesuai dengan productID.
                 for (let i = 0; i < productID.length; i++) {
                     const productIndex = userCart.products.findIndex(product => product.productID == productID[i]);
 
                     if (productIndex >= 0) {
+                        //Jika jumlah produk adalah 0, produk dihapus dari keranjang.
                         if (quantity[i] == 0) {
                             console.log('masuk sini');
                             userCart.products.splice(productIndex, 1);
                         }
                         else {
+                            //Jika jumlah produk lebih dari 0, jumlah produk diperbarui.
                             userCart.products[productIndex].quantity = quantity[i];
                         }
                     }
                 }
+                //Menyimpan perubahan keranjang ke basis data.
                 await userCart.save();
             }
-
+            //Mengirimkan respons dengan status kode 200 dan pesan sukses.
             res.status(200).json({
                 message: 'Update cart',
             });
@@ -273,6 +279,7 @@ class cartController {
     }
     
     static async calculateShippingCost(cart) {
+        //Konstanta untuk Lokasi Pengiriman Gratis:
         const FREE_SHIPPING_LATITUDE = -7.9469;
         const FREE_SHIPPING_LONGITUDE = 112.6161;
 
@@ -280,11 +287,11 @@ class cartController {
         if (cart.destination.latitude === FREE_SHIPPING_LATITUDE && cart.destination.longitude === FREE_SHIPPING_LONGITUDE) {
             return 0;
         }
-
+        //Pengecekan Ketersediaan Koordinat Tujuan
         if (!cart.destination.latitude || !cart.destination.longitude) {
             return 0;
         }
-
+        //Asumsi bahwa semua produk dalam keranjang berasal dari lokasi yang sama. Lokasi produk diambil dari produk pertama dalam keranjang.
         const productLocation = await Product.findById(cart.products[0].productID); // Assuming all products have the same location
         const { latitude: productLatitude, longitude: productLongitude } = productLocation;
 
@@ -293,11 +300,13 @@ class cartController {
         const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${productLatitude},${productLongitude}&destinations=${cart.destination.latitude},${cart.destination.longitude}&key=${apiKey}`;
 
         try {
+            //Mengirimkan Permintaan ke API Google Maps
             console.log('Request URL:', url); // Log the request URL for debugging
 
             const response = await axios.get(url);
 
             console.log('API Response:', response.data); // Log the full API response for debugging
+            //Memproses Respons dari API Google Maps
 
             if (response.data && response.data.rows && response.data.rows.length > 0 &&
                 response.data.rows[0].elements && response.data.rows[0].elements.length > 0 &&
@@ -315,6 +324,7 @@ class cartController {
                 console.error('Invalid response structure from Google Maps API', response.data);
                 return 0;
             }
+            //Menangani Kesalahan Permintaan API
         } catch (error) {
             console.error('Error fetching distance from Google Maps API', error);
             return 0;
