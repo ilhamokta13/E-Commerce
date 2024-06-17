@@ -240,7 +240,7 @@ class UserController {
             res.status(200).json({
                 error: false,
                 message: 'Success update password'
-            });
+            });g
         }
         catch (error) {
             res.status(500).json({
@@ -265,6 +265,8 @@ class UserController {
             }
 
             //Meng-generate token acak untuk reset password menggunakan crypto.randomBytes.
+            //crypto. rantomBytes =  enkiripsi password (biar pengguna aja yang tahu)
+            //hex = konvert token agar tidak terlalu panjang
 
             // Generate a reset token and expiration time
             const resetToken = crypto.randomBytes(3).toString('hex');

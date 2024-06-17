@@ -263,11 +263,11 @@ class TransaksiController {
             //midtransBaseUrl: URL untuk API Midtrans di lingkungan sandbox (pengujian).
             //midtransServerKey: Kunci server Midtrans yang digunakan untuk otentikasi.
             const midtransBaseUrl = 'https://app.sandbox.midtrans.com/snap/v1/transactions';
-            const midtransServerKey = 'SB-Mid-server-eDKCIhRGlkITnvMDtUpkinKE';
+            const midtransServerKey = 'Mid-server-OEkBKipwOcYl5id01Yh-kdKA';
             //snap: Objek klien Midtrans Snap yang diinisialisasi dengan kunci server dan pengaturan mode pengujian (bukan produksi)
     
             let snap = new midtransClient.Snap({
-                isProduction: false,
+                isProduction: true,
                 serverKey: midtransServerKey
             });
 
@@ -447,6 +447,7 @@ class TransaksiController {
         });
     }
 
+    //buat admin
     async getTransaksi(req, res) {
         try {
             const user = req.user._id || '65b93b4f3b4839656e9c05b0';
@@ -491,6 +492,8 @@ class TransaksiController {
     //Tujuan: Mengambil dan menampilkan data transaksi untuk pengguna yang sedang masuk (logged-in).
     //req: Objek permintaan dari Express.js yang berisi informasi tentang pengguna yang sedang masuk.
     //res: Objek respons dari Express.js untuk mengirimkan respons HTTP.
+
+    //get transasksi user
     async getTransaksiUser(req, res) {
         //user: Mengambil ID pengguna dari objek req.user. Asumsinya adalah middleware otentikasi sebelumnya telah menambahkan objek user ke req.
         const user = req.user.id;
@@ -589,10 +592,12 @@ class TransaksiController {
     //Mengambil dan menampilkan data transaksi yang melibatkan produk yang dijual oleh admin.
     //req: Objek permintaan dari Express.js yang berisi informasi tentang pengguna (admin) yang sedang masuk. 
     //res: Objek respons dari Express.js untuk mengirimkan respons HTTP.
+
+    //buat admin
     async getTransaksiAdmin(req, res) {
         //adminUserID: Mengambil ID admin dari objek req.user. Asumsinya adalah middleware otentikasi sebelumnya telah menambahkan objek user ke req.
         const adminUserID = req.user.id;
-    
+        // blok try catch : buat error handling 
         try {
             //Blok try-catch: Digunakan untuk menangkap dan menangani kesalahan yang mungkin terjadi selama proses pengambilan data. 
             //transaksi: Mencari semua transaksi di database dan melakukan populasi pada field ProductID di dalam Products dan field user untuk mengambil data lengkap produk dan pengguna dari koleksi terkait.
