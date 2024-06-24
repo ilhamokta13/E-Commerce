@@ -45,7 +45,14 @@ const UserSchema = new Schema({
     longitude: {
         type: Number,
         required: false,
+    },
+
+    sellerID: {
+        type: String,
+        required: false,
+        unique: true,
     }
+   
 
    
 

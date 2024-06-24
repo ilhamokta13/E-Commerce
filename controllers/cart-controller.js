@@ -24,13 +24,14 @@ class cartController {
     //Penggunaan blok try-catch untuk menangani kesalahan yang mungkin terjadi selama eksekusi fungsi.
     static async getCart(req, res) {
         try {
-            //Fungsi mengekstrak ID pengguna dari objek req.user, yang diasumsikan sudah diisi oleh middleware autentikasi.
             const userID = req.user.id;
-            //Fungsi mencari keranjang belanja pengguna berdasarkan userID. Metode populate('products.productID') digunakan untuk memuat informasi detail produk dalam keranjang.
-            const userCart = await cart.findOne({ userID: userID }).populate('products.productID');
-            
-            // Ubah data ke dalam format list
-            //Data keranjang belanja yang ditemukan diubah menjadi format objek responseData.
+            let userCart = await cart.findOne({ userID: userID }).populate('products.productID');
+
+            // Filter out products that are out of stock
+            userCart.products = userCart.products.filter(product => product.productID.stock > 0);
+
+            await userCart.save();
+
             const responseData = {
                 destination: userCart.destination,
                 _id: userCart._id,
@@ -39,12 +40,11 @@ class cartController {
                 shippingCost: userCart.shippingCost,
                 __v: userCart.__v
             };
-            //Data responseData dibungkus dalam list dan dikirimkan sebagai respons dengan status kode 200 beserta pesan sukses.
+
             res.status(200).json({
                 message: 'Get cart',
-                data: [responseData] // Bungkus data dalam list
+                data: [responseData]
             });
-            //Jika terjadi kesalahan selama eksekusi fungsi, blok catch akan menangkapnya dan mengirimkan respons dengan status kode 500 beserta pesan error.
         } catch (error) {
             res.status(500).json({
                 error: true,
@@ -104,7 +104,6 @@ class cartController {
 
 
     
-
     static async addToCart(req, res) {
         const userID = req.user.id;
         const { productID, quantity, latitude, longitude } = req.body;
@@ -121,6 +120,17 @@ class cartController {
         try {
             // Mencari keranjang pengguna
             const userCart = await cart.findOne({ userID: userID });
+
+             for (let i = 0; i < newProducts.length; i++) {
+            const productData = await Product.findById(newProducts[i].productID);
+
+            // Periksa apakah stok cukup
+            if (!productData || productData.stock < newProducts[i].quantity) {
+                return res.status(400).json({
+                    message: `Stok produk ${productData.nameProduct} tidak mencukupi. Stok tersedia: ${productData.stock}`,
+                });
+            }
+        }
     
             if (userCart) {
                 // Jika keranjang pengguna sudah ada
@@ -179,6 +189,13 @@ class cartController {
                 const productIndex = userCart.products.findIndex(product => product.productID == productID);
 
                 if (productIndex >= 0) {
+                    // Periksa stok produk
+                    const productData = await Product.findById(productID);
+                if (!productData || productData.stock < userCart.products[productIndex].quantity) {
+                    return res.status(400).json({
+                        message: `Stok produk ${productData.nameProduct} tidak mencukupi. Stok tersedia: ${productData.stock}`,
+                    });
+                }
                     // Jika produk ditemukan dalam keranjang, kurangi jumlahnya
                     if (userCart.products[productIndex].quantity > 1) {
                         userCart.products[productIndex].quantity--;
@@ -227,6 +244,13 @@ class cartController {
                     const productIndex = userCart.products.findIndex(product => product.productID == productID[i]);
 
                     if (productIndex >= 0) {
+                         // Periksa stok produk
+                    const productData = await Product.findById(productID[i]);
+                    if (!productData || productData.stock < quantity[i]) {
+                        return res.status(400).json({
+                            message: `Stok produk ${productData.nameProduct} tidak mencukupi. Stok tersedia: ${productData.stock}`,
+                        });
+                    }
                         //Jika jumlah produk adalah 0, produk dihapus dari keranjang.
                         if (quantity[i] == 0) {
                             console.log('masuk sini');
@@ -329,7 +353,72 @@ class cartController {
             console.error('Error fetching distance from Google Maps API', error);
             return 0;
         }
-    }
+    }   
+
+    // static async calculateShippingCost(cart) {
+    //     // Konstanta untuk Lokasi Pengiriman Gratis:
+    //     const FREE_SHIPPING_LATITUDE = -7.9469;
+    //     const FREE_SHIPPING_LONGITUDE = 112.6161;
+    
+    //     // Check if the destination is the free shipping location
+    //     if (cart.destination.latitude === FREE_SHIPPING_LATITUDE && cart.destination.longitude === FREE_SHIPPING_LONGITUDE) {
+    //         return 0;
+    //     }
+    
+    //     // Pengecekan Ketersediaan Koordinat Tujuan
+    //     if (!cart.destination.latitude || !cart.destination.longitude) {
+    //         return 0;
+    //     }
+    
+    //     // Asumsi bahwa semua produk dalam keranjang berasal dari lokasi yang sama. Lokasi produk diambil dari produk pertama dalam keranjang.
+    //     const productLocation = await Product.findById(cart.products[0].productID); // Assuming all products have the same location
+    //     const { latitude: productLatitude, longitude: productLongitude } = productLocation;
+    
+    //     const apiKey = 'AIzaSyC0PrXhOmCsY0W6WBWwTZpErulWQdh_Huw'; // Replace with your actual API key
+    
+    //     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${productLatitude},${productLongitude}&destinations=${cart.destination.latitude},${cart.destination.longitude}&key=${apiKey}`;
+    
+    //     try {
+    //         // Mengirimkan Permintaan ke API Google Maps
+    //         console.log('Request URL:', url); // Log the request URL for debugging
+    
+    //         const response = await axios.get(url);
+    
+    //         console.log('API Response:', response.data); // Log the full API response for debugging
+    //         // Memproses Respons dari API Google Maps
+    
+    //         if (response.data && response.data.rows && response.data.rows.length > 0 &&
+    //             response.data.rows[0].elements && response.data.rows[0].elements.length > 0 &&
+    //             response.data.rows[0].elements[0].distance &&
+    //             response.data.origin_addresses && response.data.origin_addresses.length > 0 &&
+    //             response.data.destination_addresses && response.data.destination_addresses.length > 0) {
+                
+    //             const distance = response.data.rows[0].elements[0].distance.value; // Distance in meters
+    //             console.log('Jarak lokasi adalah', distance);
+    //             const distanceInKm = distance / 1000; // Convert to kilometers
+    
+    //             // Menghitung biaya pengiriman berdasarkan jarak
+    //             let shippingCost;
+    //             if (distanceInKm <= 1) {
+    //                 shippingCost = 1000; // 1 km pertama
+    //             } else if (distanceInKm <= 5) {
+    //                 shippingCost = 1000 + (distanceInKm - 1) * 2000; // 1 km pertama + 4 km berikutnya
+    //             } else {
+    //                 shippingCost = 1000 + (4 * 2000) + (distanceInKm - 5) * 3000; // 1 km pertama + 4 km berikutnya + km sisanya
+    //             }
+    
+    //             return shippingCost;
+    //         } else {
+    //             console.error('Invalid response structure from Google Maps API', response.data);
+    //             return 0;
+    //         }
+    //         // Menangani Kesalahan Permintaan API
+    //     } catch (error) {
+    //         console.error('Error fetching distance from Google Maps API', error);
+    //         return 0;
+    //     }
+    // }
+    
     
 }
 

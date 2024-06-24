@@ -11,7 +11,7 @@ class ProductController {
     static async createProduct(req, res) {
         try {
             //Data yang diperlukan untuk membuat produk baru diekstrak dari body request (req.body) dan informasi pengguna (req.user.id).
-            const { nameProduct, price, description, category, releaseDate, latitude, longitude } = req.body;
+            const { nameProduct, price, description, category, releaseDate, latitude, longitude, stock } = req.body;
             const sellerID = req.user.id;
             console.log(sellerID);
             //Fungsi mencari ID penjual (sellerID) dalam basis data. Jika tidak ditemukan, fungsi melempar error dengan status kode 401.
@@ -30,7 +30,8 @@ class ProductController {
                 sellerID,
                 releaseDate,
                 latitude,
-                longitude
+                longitude,
+                stock
             });
             product.image = req.file.filename;
             console.log(product);
@@ -156,7 +157,7 @@ class ProductController {
         try {
             //Fungsi mengekstrak ID produk dari parameter URL (req.params) dan data produk yang baru dari body request (req.body).
             const { id } = req.params;
-            const { nameProduct, price, description, category, releaseDate, latitude, longitude } = req.body;
+            const { nameProduct, price, description, category, releaseDate, latitude, longitude, stock } = req.body;
 
             //Fungsi mencari produk dalam basis data berdasarkan ID yang diperoleh.
             const findProduct = await Product.findById(id);
@@ -188,7 +189,8 @@ class ProductController {
                 sellerID,
                 releaseDate,
                 latitude,
-                longitude
+                longitude, 
+                stock
             });
             //Jika produk berhasil diperbarui, fungsi mengirimkan respons dengan status kode 200 beserta data produk yang diperbarui dan pesan sukses.
             res.status(200).json({

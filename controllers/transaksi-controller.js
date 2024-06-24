@@ -18,6 +18,9 @@ const geolib = require('geolib');
 //admin: Modul untuk mengirim notifikasi menggunakan Firebase Cloud Messaging.
 const admin = require('../chat/firebase');
 
+
+
+
 // Konfigurasi multer untuk penyimpanan file
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -44,6 +47,14 @@ const upload = multer({
         cb(new Error('Only images are allowed'));
     }
 });
+
+const message = {
+    token: "dKMF1UQyQnGm_WUeAMlEdF:APA91bF93yoXbHFOJKadt6GlneceSkVlCqlDT_XPE5QQZg4Ibfei-b_pPoNy9aE7DZ0m0Vrt0ImeUQaTfX7FPStgbiF6RRlSKsrF-VdkHioouDUY2GdEFQBT7VhM1zIcih-zUZHIk0ka",
+    notification: {
+        title: 'Pesanan Baru',
+        body: 'Ada pesanan baru yang melibatkan produk Anda'
+    },
+};
 
 
 
@@ -179,6 +190,7 @@ class TransaksiController {
         //Menyimpan transaksi baru ke database.
         await newTransaksi.save();
     
+    
         //Memuat kembali transaksi yang baru dibuat dengan detail produk.
         const populatedTransaksi = await Transaksi.findById(newTransaksi._id).populate('Products.ProductID');
         //Membuat transaksi Midtrans dengan memanggil createMidtransTransaction.
@@ -186,11 +198,12 @@ class TransaksiController {
         
         // Kirim notifikasi ke admin setelah transaksi berhasil dibuat
         const message = {
+            token: "dKMF1UQyQnGm_WUeAMlEdF:APA91bF93yoXbHFOJKadt6GlneceSkVlCqlDT_XPE5QQZg4Ibfei-b_pPoNy9aE7DZ0m0Vrt0ImeUQaTfX7FPStgbiF6RRlSKsrF-VdkHioouDUY2GdEFQBT7VhM1zIcih-zUZHIk0ka",
             notification: {
                 title: 'Pesanan Baru',
                 body: 'Ada pesanan baru yang melibatkan produk Anda'
             },
-            topic: 'admin'
+           
         };
 
         admin.messaging().send(message)
@@ -397,42 +410,95 @@ class TransaksiController {
     //Memperbarui status transaksi berdasarkan data yang diterima dari permintaan (request) Midtrans.
     //req: Objek permintaan dari Express.js yang berisi data notifikasi dari Midtrans.
     //res: Objek respons dari Express.js untuk mengirimkan respons HTTP.
-    async updateStatus(req, res) {
+    // async updateStatus(req, res) {
+    //     //request: Menyimpan data notifikasi yang diterima dari body permintaan.
+    //     //order_id: Mengambil order_id dari data notifikasi untuk mencari transaksi yang sesuai.
+    //     const request = req.body;
+    //     const order_id = request.order_id;
+
+    //     //transaksi: Mencari transaksi di database menggunakan kode_transaksi yang sesuai dengan order_id dari notifikasi.
+    //     const transaksi = await Transaksi.findOne({ kode_transaksi: order_id });
+
+    //     //Kondisi: Memeriksa apakah transaksi ditemukan dan apakah status transaksi adalah 'settlement'
+    //     //if (request.transaction_status === 'settlement'): Jika status transaksi adalah 'settlement', ubah status transaksi menjadi 'Paid' dan status setiap produk menjadi 'Paid'.
+    //     //else if (request.transaction_status === 'expire'): Jika status transaksi adalah 'expire', ubah status transaksi menjadi 'Dibatalkan' dan status setiap produk menjadi 'Dibatalkan'.
+    //     if (transaksi && request.transaction_status === 'settlement') {
+    //         if (request.transaction_status === 'settlement') {
+    //             transaksi.status = 'Paid';
+    //             transaksi.Products.forEach(product => {
+    //                 product.status = 'Paid';
+    //             });
+    //         } else if (request.transaction_status === 'expire') {
+    //             transaksi.status = 'Dibatalkan';
+    //             transaksi.Products.forEach(product => {
+    //                 product.status = 'Dibatalkan';
+    //             });
+            
+    //         };
+    //         //transaksi.save(): Menyimpan perubahan status transaksi dan produk ke database.
+    //         //res.status(200).json(...): Mengirimkan respons dengan status 200 (OK) dan data transaksi yang telah diperbarui.
+
+    //         await transaksi.save();
+    //         res.status(200).json({
+    //             message: 'Berhasil update status transaksi',
+    //             data: transaksi
+    //         });
+    //     }
+    //     //else: Jika transaksi tidak ditemukan, kirimkan respons dengan status 400 (Bad Request) dan pesan bahwa transaksi tidak ditemukan.
+    //     else {
+    //         res.status(400).json({
+    //             message: 'Transaksi tidak ditemukan'
+    //         });
+    //     }
+    // }
+    
+    async  updateStatus(req, res) {
         //request: Menyimpan data notifikasi yang diterima dari body permintaan.
-        //order_id: Mengambil order_id dari data notifikasi untuk mencari transaksi yang sesuai.
         const request = req.body;
         const order_id = request.order_id;
-
+    
         //transaksi: Mencari transaksi di database menggunakan kode_transaksi yang sesuai dengan order_id dari notifikasi.
         const transaksi = await Transaksi.findOne({ kode_transaksi: order_id });
-
+    
         //Kondisi: Memeriksa apakah transaksi ditemukan dan apakah status transaksi adalah 'settlement'
-        //if (request.transaction_status === 'settlement'): Jika status transaksi adalah 'settlement', ubah status transaksi menjadi 'Paid' dan status setiap produk menjadi 'Paid'.
-        //else if (request.transaction_status === 'expire'): Jika status transaksi adalah 'expire', ubah status transaksi menjadi 'Dibatalkan' dan status setiap produk menjadi 'Dibatalkan'.
-        if (transaksi && request.transaction_status === 'settlement') {
+        if (transaksi) {
             if (request.transaction_status === 'settlement') {
                 transaksi.status = 'Paid';
-                transaksi.Products.forEach(product => {
+                transaksi.Products.forEach(async product => {
                     product.status = 'Paid';
+
+                // Mengurangi stok produk
+                const productData = await Product.findById(product.ProductID);
+                if (productData) {
+                    productData.stock -= product.quantity;
+                    await productData.save();
+                }
+
                 });
+    
+                // Mengirim notifikasi
+                try {
+                    
+                    await admin.messaging().send(message);
+                    console.log('Notifikasi berhasil dikirim');
+                } catch (error) {
+                    console.error('Gagal mengirim notifikasi:', error);
+                }
             } else if (request.transaction_status === 'expire') {
                 transaksi.status = 'Dibatalkan';
                 transaksi.Products.forEach(product => {
                     product.status = 'Dibatalkan';
                 });
-            
-            };
+            }
+    
             //transaksi.save(): Menyimpan perubahan status transaksi dan produk ke database.
-            //res.status(200).json(...): Mengirimkan respons dengan status 200 (OK) dan data transaksi yang telah diperbarui.
-
             await transaksi.save();
             res.status(200).json({
                 message: 'Berhasil update status transaksi',
                 data: transaksi
             });
-        }
-        //else: Jika transaksi tidak ditemukan, kirimkan respons dengan status 400 (Bad Request) dan pesan bahwa transaksi tidak ditemukan.
-        else {
+        } else {
+            // Jika transaksi tidak ditemukan, kirimkan respons dengan status 400 (Bad Request) dan pesan bahwa transaksi tidak ditemukan.
             res.status(400).json({
                 message: 'Transaksi tidak ditemukan'
             });
@@ -643,11 +709,12 @@ class TransaksiController {
              //topic: Mengirimkan notifikasi kepada semua pengguna yang berlangganan topik 'admin'.
              //send: Mengirim pesan notifikasi menggunakan admin.messaging() (Firebase Admin SDK).
             const message = {
+                token: "dKMF1UQyQnGm_WUeAMlEdF:APA91bF93yoXbHFOJKadt6GlneceSkVlCqlDT_XPE5QQZg4Ibfei-b_pPoNy9aE7DZ0m0Vrt0ImeUQaTfX7FPStgbiF6RRlSKsrF-VdkHioouDUY2GdEFQBT7VhM1zIcih-zUZHIk0ka",
                 notification: {
                     title: 'Transaksi Baru',
                     body: 'Ada transaksi baru yang melibatkan produk Anda'
                 },
-                topic: 'admin'
+               
             };
     
             admin.messaging().send(message)

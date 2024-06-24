@@ -11,6 +11,8 @@ router.get('/', function (req, res, next) {
 router.route('/register')
   .post(userController.register);
 
+  
+
 // Login
 router.route('/login')
   .post(userController.login);
@@ -38,6 +40,15 @@ router.route('/profile')
 // Get all user profiles
 router.route('/allprofiles')
   .get(checkAuth, userController.getAllUserProfiles);
+
+
+// Get all customers
+router.route('/customers')
+.get(checkAuth, userController.getCustomers);
+
+// Get all sellers
+router.route('/sellers')
+.get(checkAuth, userController.getSellers);
 
 
 

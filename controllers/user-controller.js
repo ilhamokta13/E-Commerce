@@ -8,6 +8,9 @@ const crypto = require('crypto'); // Add crypto for generating reset tokens
 
 const ejs = require('ejs');
 
+const admin = require('firebase-admin');
+
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -27,7 +30,6 @@ class UserController {
             //bcrypt.hash: Menggunakan bcrypt untuk mengenkripsi kata sandi dengan tingkat kesulitan (salt rounds) 12.
             const { fullName, email, password, telp, role } = req.body;
             const hash = await bcrypt.hash(password, 12);
-
             //User: Membuat instance baru dari model User dengan data pengguna yang telah diambil dari permintaan, termasuk kata sandi yang sudah dienkripsi (hash).
             //user.save(): Menyimpan instance pengguna baru ke dalam database.
             const user = new User({
@@ -365,13 +367,39 @@ class UserController {
         }
     }
 
+    // Mendapatkan semua pengguna dengan peran Customer
+    static async getCustomers(req, res, next) {
+        try {
+            const customers = await User.find({ role: 'Customer' });
+            res.status(200).json({
+                error: false,
+                message: 'Success',
+                data: customers
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: true,
+                message: error.message
+            });
+        }
+    }
 
-
-
-
-
-
-   
+    // Mendapatkan semua pengguna dengan peran Seller
+    static async getSellers(req, res, next) {
+        try {
+            const sellers = await User.find({ role: 'Seller' });
+            res.status(200).json({
+                error: false,
+                message: 'Success',
+                data: sellers
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: true,
+                message: error.message
+            });
+        }
+    }
 
     
     }

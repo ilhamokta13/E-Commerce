@@ -372,8 +372,9 @@ function getProductPaths() {
                                     releaseDate: { type: 'string' },
                                     latitude: { type: 'number' }, // Updated to latitude
                                     longitude: { type: 'number' }, // Updated to longitude
+                                    stock: { type: 'number' },
                                 },
-                                required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'latitude', 'longitude'], // Updated to include latitude and longitude
+                                required: ['nameProduct', 'price', 'description', 'image', 'category', 'releaseDate', 'latitude', 'longitude', 'stock'], // Updated to include latitude and longitude
                             },
                         },
                     },
@@ -490,8 +491,9 @@ function getProductPaths() {
                                     releaseDate: { type: 'string', format: 'date' }, // Assuming releaseDate is a date
                                     latitude: { type: 'number' }, // Updated to latitude
                                     longitude: { type: 'number' }, // Updated to longitude
+                                    stock: { type: 'number' },
                                 },
-                                required: ['nameProduct', 'price', 'description', 'category', 'releaseDate', 'latitude', 'longitude'], // Updated to include latitude and longitude
+                                required: ['nameProduct', 'price', 'description', 'category', 'releaseDate', 'latitude', 'longitude', 'stock'], // Updated to include latitude and longitude
                             },
                         },
                     },

@@ -33,6 +33,11 @@ const ProductSchema = new Schema({
         type: Number,
         required: true, // Depending on your requirements
     },
+    stock: {
+        type: Number,
+        required: true, // Menambahkan stok sebagai properti wajib
+        min: 0
+    },
     offers: [{
         buyerID: {
             type: Schema.Types.ObjectId,
