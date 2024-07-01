@@ -36,6 +36,7 @@ const swaggerOptions = {
             ...getProductPaths(),
             ...getCartPaths(),
             ...getTransaksiPaths(),
+            ...getChatPaths(), 
             // ... (add other paths as needed)
         },
     },
@@ -231,6 +232,41 @@ function getUserPaths() {
         },
     };
 }
+
+function getChatPaths() {
+    return {
+        '/chat/sendMessage': {
+            post: {
+                summary: 'Send a chat message.',
+                tags: ['Chat'],
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    room: { type: 'string' },
+                                    message: { type: 'string' },
+                                },
+                                required: ['room', 'message'],
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'Message sent successfully.',
+                    },
+                    500: {
+                        description: 'Internal Server Error.',
+                    },
+                },
+            },
+        },
+    };
+}
+
+
 
 function getAdmin() {
     return {

@@ -11,8 +11,9 @@ class ProductController {
     static async createProduct(req, res) {
         try {
             //Data yang diperlukan untuk membuat produk baru diekstrak dari body request (req.body) dan informasi pengguna (req.user.id).
-            const { nameProduct, price, description, category, releaseDate, latitude, longitude, stock } = req.body;
+            const { userId, nameProduct, price, description, category, releaseDate, latitude, longitude, stock } = req.body;
             const sellerID = req.user.id;
+
             console.log(sellerID);
             //Fungsi mencari ID penjual (sellerID) dalam basis data. Jika tidak ditemukan, fungsi melempar error dengan status kode 401.
             const findSellerID = await User.findById(sellerID);
@@ -23,6 +24,7 @@ class ProductController {
             }
             //Objek produk baru dibuat dengan data yang telah diekstrak, termasuk file gambar yang diunggah (disimpan dalam req.file.filename).
             const product = new Product({
+                userId,
                 nameProduct,
                 price,
                 description,

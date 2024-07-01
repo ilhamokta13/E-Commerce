@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const UserSchema = new Schema({
+    userId: {
+        type: String,
+        required: true,
+    },
     fullName: {
         type: String,
         required: true,
@@ -31,6 +35,8 @@ const UserSchema = new Schema({
         default: 'No Shop Name',
     },
 
+   
+
     resetPasswordToken: {
         type: String,
     },
@@ -47,12 +53,8 @@ const UserSchema = new Schema({
         required: false,
     },
 
-    sellerID: {
-        type: String,
-        required: false,
-        unique: true,
-    }
-   
+
+ 
 
    
 

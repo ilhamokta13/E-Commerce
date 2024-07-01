@@ -1,8 +1,23 @@
 const express = require('express');
+const router = express.Router();
 const connectToDatabase = require('./utils/db-connection');
 const { setupMiddleware } = require('./utils/middleware');
 const ExpressError = require('./utils/ExpressError');
 const swagger = require('./swagger')
+const app = express();
+
+
+
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const { createServer } = require("http");
+
+const socket = require("./utils/socket");
+require("dotenv").config();
+
+const server = createServer(app);
+const io = socket.init(server);
 
 // Routes
 // const aaa = require('./routes/index-route');
@@ -13,7 +28,7 @@ const cartRoutes = require('./routes/cart-route');
 const transaksiRoutes = require('./routes/transaksi-route');
 
 
-const app = express();
+
 const port = process.env.PORT || 3000;
 
 // Connect to MongoDB
@@ -38,6 +53,26 @@ app.use('/product', productRoutes);
 app.use('/cart', cartRoutes);
 app.use('/admin', adminRoutes);
 app.use('/transaksi', transaksiRoutes);
+
+
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:8000",
+  })
+);
+
+app.use(bodyParser.json());
+app.use(cookieParser());
+
+app.use("/api", router);
+
+io.on("connection", (socket) => {
+  console.log("a user connected");
+});
+
+
+
 
 // Error route
 app.all('*', (req, res, next) => {

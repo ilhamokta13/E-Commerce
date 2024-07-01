@@ -28,11 +28,12 @@ class UserController {
             //try-catch: Digunakan untuk menangkap dan menangani kesalahan yang mungkin terjadi selama proses pendaftaran.
             //Destrukturisasi: Mengambil fullName, email, password, telp, dan role dari body permintaan (req.body).
             //bcrypt.hash: Menggunakan bcrypt untuk mengenkripsi kata sandi dengan tingkat kesulitan (salt rounds) 12.
-            const { fullName, email, password, telp, role } = req.body;
+            const { userId, fullName, email, password, telp, role } = req.body;
             const hash = await bcrypt.hash(password, 12);
             //User: Membuat instance baru dari model User dengan data pengguna yang telah diambil dari permintaan, termasuk kata sandi yang sudah dienkripsi (hash).
             //user.save(): Menyimpan instance pengguna baru ke dalam database.
             const user = new User({
+                userId,
                 fullName,
                 email,
                 password: hash,

@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 
 const TransaksiSchema = new Schema({
+    userId: {
+        type: String,
+        ref: 'User',
+    },
     kode_transaksi: {
         type: String,
         required: true,
